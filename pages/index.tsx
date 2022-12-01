@@ -1,5 +1,9 @@
+import HelloComponent from "../components/HelloComponent"
+
 function HomePage() {
-  return <div>Hello Next.js</div>
+  return (
+    <HelloComponent />
+  )
 }
 
 export default HomePage

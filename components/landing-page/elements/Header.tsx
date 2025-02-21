@@ -1,6 +1,11 @@
+"use client"
+
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 export default function Header() {
+  const router = useRouter()
+
   return (
     <header className="fixed w-full bg-white border-b border-neutral-200 z-50">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -20,7 +25,7 @@ export default function Header() {
           ))}
         </nav>
         <div className="flex items-center space-x-4">
-          <button className="px-4 py-2 text-neutral-600 hover:text-neutral-900">Log In</button>
+          <button onClick={() => router.push('/auth/signin')} className="px-4 py-2 text-neutral-600 hover:text-neutral-900">Log In</button>
           <button className="px-4 py-2 bg-neutral-900 text-white rounded-lg hover:bg-neutral-800">Sign Up</button>
         </div>
       </div>

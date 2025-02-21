@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import HelloComponent from '../components/HelloComponent'
 import Home from '../components/landing-page'
-import HomeAtomic from '../components/landingpage'
+// import HomeAtomic from '../components/landingpage'
  
 export const metadata: Metadata = {
   title: 'Chainx - AI Smart Contract Security Scanner',
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function Page() {
   return (
     <div className=''>
-      <HomeAtomic />
+      <Home />
     </div>
   )
 }

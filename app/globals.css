@@ -3,6 +3,9 @@
 :root {
   --color-primary: #168563;
   --color-primary-dark: #1ea97c;
+  --home-50: #f0f9f6;
+  --home-500: #0e784d;
+  --home-600: #0c6b44;
 }
 
 .dark {

@@ -5,6 +5,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Eye, EyeOff, Shield, Activity, ArrowRight } from 'lucide-react' // Assuming you use lucide-react for icons
 import Image from "next/image"
+import { useAuth } from "../../lib/auth"
 
 interface FormData {
   email: string
@@ -19,6 +20,7 @@ interface LoginResponse {
 }
 
 export default function AuthPage() {
+  const {login} = useAuth()
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -38,6 +40,20 @@ export default function AuthPage() {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    setError('')
+
+    try {
+      await login(formData.email, formData.password)
+    } catch (err) {
+      setError('Invalid credentials')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleSubmit333 = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setError("")
@@ -73,7 +89,7 @@ export default function AuthPage() {
           localStorage.setItem("rememberMe", "true")
         }
   
-        router.push("/dashboard")
+        router.push("/dashboard/init")
       } else {
         setError(data.message || "Invalid credentials")
       }

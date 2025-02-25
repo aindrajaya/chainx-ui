@@ -15,6 +15,8 @@ import {
   ChevronDown
 } from "lucide-react"
 import { ThemeToggle } from "./theme-toggle"
+import { useRouter } from "next/navigation"
+import { useAuth } from "../app/lib/auth"
 
 interface MenuItem {
   label: string
@@ -33,6 +35,8 @@ const mainMenuItems: MenuItem[] = [
 ]
 
 export default function Header({ isNavigationDisabled = true }: HeaderProps) {
+  const router = useRouter()
+  const {logout} = useAuth()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
@@ -42,6 +46,11 @@ export default function Header({ isNavigationDisabled = true }: HeaderProps) {
     { id: 2, text: "Usage limit warning", time: "1h ago" },
     { id: 3, text: "Security alert", time: "3h ago" },
   ]
+
+  const handleLogout = async () => {
+    await logout()
+    router.push('/auth/signin')
+  }
 
   return (
     <header 
@@ -203,7 +212,7 @@ export default function Header({ isNavigationDisabled = true }: HeaderProps) {
                     </Link>
                     <button
                       className="flex items-center w-full px-4 py-2 text-sm text-red-700 hover:bg-gray-100"
-                      onClick={() => {/* Handle logout */}}
+                      onClick={() => handleLogout()}
                     >
                       <LogOut className="h-4 w-4 mr-3" />
                       Sign out

@@ -18,6 +18,18 @@ module.exports = {
         'header': 'var(--header-height, 64px)',
       },
       colors: {
+        home: {
+          50: '#ecfdf3',
+          100: '#d1fae1',
+          200: '#a7f3c9',
+          300: '#6ee7ac',
+          400: '#34d389',
+          500: '#0c774c', // main color
+          600: '#059669',
+          700: '#047857',
+          800: '#065f46',
+          900: '#064e3b',
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -50,7 +62,7 @@ module.exports = {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
-        },
+        }
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -58,6 +70,19 @@ module.exports = {
         sm: "calc(var(--radius) - 4px)",
       },
     },
+    fontFamily: {
+      grotesk: [
+        "Space Grotesk",
+        "-apple-system",
+        "BlinkMacSystemFont",
+        "Segoe UI",
+        "Roboto",
+        "Oxygen-Sans",
+        "Ubuntu,Cantarell",
+        "Helvetica",
+        "sans-serif",
+      ],
+    }
   },
   plugins: [require("tailwindcss-animate")],
 }

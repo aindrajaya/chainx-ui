@@ -1,14 +1,37 @@
+"use client"
 import type React from "react"
 import Footer from "../../components/Footer"
 import Header from "../../components/Header"
 import Sidebar from "../../components/sidebar"
 import { ThemeProvider } from "../../components/theme-provider"
+import { useRouter } from "next/navigation"
+import {useEffect} from "react"
+import { useAuth } from "../lib/auth"
+
+
 
 export default function DashboardLayout({
     children,
 }: {
     children: React.ReactNode
 }) {
+    const { isLoading, isAuthenticated } = useAuth()
+    const router = useRouter()
+  
+    useEffect(() => {
+      if (!isLoading && !isAuthenticated) {
+        router.push('/auth/signin')
+      }
+    }, [isLoading, isAuthenticated])
+  
+    if (isLoading) {
+      return <div>Loading...</div>
+    }
+  
+    if (!isAuthenticated) {
+      return null
+    }
+
     return (
         // <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <div className="flex h-screen bg-gray-50">

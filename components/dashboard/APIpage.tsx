@@ -7,16 +7,32 @@ interface ApiKey {
   id: string
   name: string
   key: string
-  status: 'Active' | 'Inactive'
+  status: 'ACTIVE' | 'INACTIVE'
   usage: number
   lastUsed: string
   createdAt: string
 }
 
-interface ApiKeyResponse {
+interface ApiKeyResponse2 {
   id: string
   key: string
   created_at: string
+}
+
+interface ApiKeyData {
+  id: string
+  keyValue: string
+  type: string
+  expiresAt: Date
+  createdAt: Date
+  updatedAt: Date
+  userId: string
+}
+
+
+interface ApiKeyResponse {
+  message: string
+  apiKey: ApiKeyData
 }
 
 // Default API Keys Data
@@ -25,7 +41,7 @@ const defaultApiKeys: ApiKey[] = [
     id: "1",
     name: "Production API Key",
     key: "pk_live_51Hb6xjK2gjK2gjK2gjK2gjK2",
-    status: 'Active',
+    status: 'ACTIVE',
     usage: 78,
     lastUsed: "2 minutes ago",
     createdAt: "2024-01-15"
@@ -34,7 +50,7 @@ const defaultApiKeys: ApiKey[] = [
     id: "2",
     name: "Development API Key",
     key: "pk_dev_51Hb6xjK2gjK2gjK2gjK2gjK2",
-    status: 'Active',
+    status: 'ACTIVE',
     usage: 45,
     lastUsed: "1 hour ago",
     createdAt: "2024-01-20"
@@ -43,7 +59,7 @@ const defaultApiKeys: ApiKey[] = [
     id: "3",
     name: "Testing API Key",
     key: "pk_test_51Hb6xjK2gjK2gjK2gjK2gjK2",
-    status: 'Inactive',
+    status: 'INACTIVE',
     usage: 12,
     lastUsed: "1 day ago",
     createdAt: "2024-01-25"
@@ -54,21 +70,21 @@ export default function ApiList() {
   const [copySuccess, setCopySuccess] = useState<string | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [apiKeys, setApiKeys] = useState<ApiKey[]>(defaultApiKeys) // Initialize with default data
+  const [apiKeys, setApiKeys] = useState<ApiKey[]>([]) // Initialize with default data
 
   // Fetch existing API keys on component mount
   useEffect(() => {
+    
+    // setAuthToken(authTokenData)
     // Comment out fetchApiKeys() if you want to use only default data
-    // fetchApiKeys()
+    fetchApiKeys()
   }, [])
 
   const fetchApiKeys = async () => {
     try {
-      const response = await fetch('https://api.chainx.id/v1/api-keys', {
-        headers: {
-          // Add any authentication headers if required
-          // 'Authorization': `Bearer ${yourAuthToken}`
-        }
+      const response = await fetch("/api/keys/get-all", {
+        method: 'GET',
+        credentials: 'include', // Important: include cookies in the request
       })
 
       if (!response.ok) {
@@ -76,21 +92,26 @@ export default function ApiList() {
       }
 
       const data = await response.json()
+
+      console.log('API key list generated #2:', data)
       
       // Transform API response to match our interface
-      const formattedKeys: ApiKey[] = data.map((key: any) => ({
+      const formattedKeys: ApiKey[] = data.data.apiKeys.map((key: any) => ({
         id: key.id,
         name: key.name || `API Key ${key.id}`,
-        key: key.key,
+        key: key.keyValue,
         status: key.status || 'Active',
-        usage: key.usage || 0,
+        // usage: key.usage || 0,
         lastUsed: key.last_used || 'Never',
-        createdAt: new Date(key.created_at).toLocaleDateString()
+        createdAt: new Date(key.createdAt).toLocaleDateString()
       }))
 
+      console.log('API key list generated #3:', formattedKeys)
+
       setApiKeys(formattedKeys)
+      
     } catch (err) {
-      setError('Failed to fetch API keys')
+      setError('Failed to fetch API keys #1')
       console.error('Error fetching API keys:', err)
     }
   }
@@ -100,16 +121,12 @@ export default function ApiList() {
     setError(null)
 
     try {
-      const response = await fetch('https://api.chainx.id/v1/create-api-key', {
+      const response = await fetch('/api/keys/generate', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          // Add authentication headers
-        },
-        body: JSON.stringify({
-          name: `API Key ${apiKeys.length + 1}`,
-        })
+        credentials: 'include', // Important: include cookies in the request
       })
+
+      console.log(response, 'response data')
 
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`)
@@ -117,12 +134,12 @@ export default function ApiList() {
 
       const data: ApiKeyResponse = await response.json()
 
-      // Create new key object
+      /// Create new key object from the response
       const newKey: ApiKey = {
-        id: (apiKeys.length + 1).toString(),
+        id: data.apiKey.id || (apiKeys.length + 1).toString(),
         name: `API Key ${apiKeys.length + 1}`,
-        key: `pk_new_${Math.random().toString(36).substr(2, 9)}`,
-        status: 'Active',
+        key: data.apiKey.keyValue,
+        status: 'ACTIVE',
         usage: 0,
         lastUsed: 'Just created',
         createdAt: new Date().toLocaleDateString()
@@ -133,7 +150,6 @@ export default function ApiList() {
 
       // Copy new API key to clipboard
       await copyToClipboard(newKey.key, newKey.id)
-
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate API key')
     } finally {
@@ -200,7 +216,7 @@ export default function ApiList() {
                   <div className="flex items-center gap-2">
                     <h3 className="text-sm font-medium text-gray-900">{key.name}</h3>
                     <span className={`px-2 py-0.5 text-xs font-medium rounded-full
-                      ${key.status === 'Active' 
+                      ${key.status === 'ACTIVE' 
                         ? 'text-green-700 bg-green-100' 
                         : 'text-gray-700 bg-gray-100'
                       }`}>
@@ -209,7 +225,8 @@ export default function ApiList() {
                   </div>
                   <div className="flex items-center mt-2">
                     <code className="text-xs bg-gray-100 px-3 py-1 rounded-md">
-                      {key.key.slice(0, 12)}...{key.key.slice(-4)}
+                      {/* {key.key.slice(0, 12)}...{key.key.slice(-4)} */}
+                      {key.key}
                     </code>
                     <button 
                       onClick={() => copyToClipboard(key.key, key.id)}

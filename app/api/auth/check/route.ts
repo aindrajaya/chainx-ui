@@ -1,11 +1,12 @@
 // app/api/auth/check/route.ts
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
+import { getCookieData } from '../../../lib/cookies-exec'
 
 export async function GET() {
   try {
-    const cookieStore = cookies()
-    const authToken = cookieStore.get('auth-token')
+    const cookieStore = await getCookieData()
+    const cookieData = cookieStore.find((cookie) => cookie.name === 'auth-token')
+    const authToken = cookieData?.value;
 
     if (!authToken || !authToken.value) {
       return NextResponse.json(

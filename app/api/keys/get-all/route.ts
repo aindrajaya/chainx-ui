@@ -18,7 +18,7 @@ export async function GET() {
 
     console.log('API key list Token get #0:', authToken)
 
-    const response = await fetch(`http://localhost:3005/api/v1/user-api-keys?userId=${authToken}`)
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/user-api-keys?userId=${authToken}`)
 
     console.log('API key list response #1:', response)
 

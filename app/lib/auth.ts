@@ -46,7 +46,7 @@ export function useAuth() {
   const login = async (email: string, password: string) => {
     try {
       // Call your actual login endpoint
-      const response = await fetch('http://localhost:3005/api/login', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),

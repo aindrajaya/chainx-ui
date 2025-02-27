@@ -2,10 +2,30 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 
+interface Cookie {
+    name: string,
+    value: string
+  }
+
+
+async function getCookieData(): Promise<Cookie[]> {
+    const cookieData: Cookie[] = cookies().getAll()
+    return new Promise((resolve) =>
+      setTimeout(() => {
+        resolve(cookieData)
+      }, 1000)
+    )
+  }
+
 export async function GET() {
+    
+
   try {
-    const cookieStore = cookies()
-    const authToken = cookieStore.get('auth-token')
+    const cookieData = await getCookieData()
+    const cookieDataToken = cookieData.find((cookie: Cookie) => cookie.name === 'auth-token')
+    const authToken = cookieDataToken?.value.toString()
+
+    console.log('Data Auth token get:', authToken)
 
     if (!authToken) {
       return NextResponse.json(
@@ -14,9 +34,9 @@ export async function GET() {
       )
     }
 
-    console.log('API key list Token get #0:', authToken.value)
+    console.log('API key list Token get #0:', authToken)
 
-    const response = await fetch(`http://localhost:3005/api/v1/user-api-keys?userId=${authToken.value}`, {
+    const response = await fetch(`http://localhost:3005/api/v1/user-api-keys?userId=${authToken}`, {
       method: 'GET'
     })
 

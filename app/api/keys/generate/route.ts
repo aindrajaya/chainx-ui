@@ -2,10 +2,28 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 
+interface Cookie {
+    name: string,
+    value: string
+  }
+
+
+async function getCookieData(): Promise<Cookie[]> {
+    const cookieData: Cookie[] = cookies().getAll()
+    return new Promise((resolve) =>
+      setTimeout(() => {
+        resolve(cookieData)
+      }, 1000)
+    )
+  }
+
 export async function POST() {
   try {
-    const cookieStore = cookies()
-    const authToken = cookieStore.get('auth-token')
+    const cookieData = await getCookieData()
+    const cookieDataToken = cookieData.find((cookie: Cookie) => cookie.name === 'auth-token')
+    const authToken = cookieDataToken?.value
+
+    console.log('API key list Token get #0:', authToken)
 
     if (!authToken) {
       return NextResponse.json(
@@ -21,7 +39,7 @@ export async function POST() {
       },
       body: JSON.stringify({
         type: "test",
-        userId: authToken.value
+        userId: authToken
       })
     })
 

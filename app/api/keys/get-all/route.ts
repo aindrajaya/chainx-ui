@@ -1,28 +1,10 @@
-// app/api/keys/generate/route.ts
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-
-interface Cookie {
-    name: string,
-    value: string
-  }
-
-
-async function getCookieData(): Promise<Cookie[]> {
-    const cookieData: Cookie[] = cookies().getAll()
-    return new Promise((resolve) =>
-      setTimeout(() => {
-        resolve(cookieData)
-      }, 1000)
-    )
-  }
+import { getCookieData } from '../../../lib/cookies-exec'
 
 export async function GET() {
-    
-
   try {
     const cookieData = await getCookieData()
-    const cookieDataToken = cookieData.find((cookie: Cookie) => cookie.name === 'auth-token')
+    const cookieDataToken = cookieData.find((cookie) => cookie.name === 'auth-token')
     const authToken = cookieDataToken?.value.toString()
 
     console.log('Data Auth token get:', authToken)

@@ -22,6 +22,8 @@ export async function GET() {
       method: 'GET'
     })
 
+    console.log('API key list response #1:', response)
+
     const data = await response.json()
 
     console.log('API key list generated #1:', data.data.apiKeys)
@@ -30,7 +32,7 @@ export async function GET() {
   } catch (error) {
     console.error('Generate API key error:', error)
     return NextResponse.json(
-      { success: false, message: 'Failed to generate API key' },
+      { success: false, message: 'Failed to get all API keys' },
       { status: 500 }
     )
   }

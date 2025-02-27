@@ -139,7 +139,7 @@ export default function ApiList() {
         id: data.apiKey.id || (apiKeys.length + 1).toString(),
         name: `API Key ${apiKeys.length + 1}`,
         key: data.apiKey.keyValue,
-        status: 'Active',
+        status: 'ACTIVE',
         usage: 0,
         lastUsed: 'Just created',
         createdAt: new Date().toLocaleDateString()

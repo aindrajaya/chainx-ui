@@ -23,9 +23,12 @@ export async function POST() {
       },
       body: JSON.stringify({
         type: "test",
-        userId: authToken
+        userId: authToken,
+        name: "Test API Key"
       })
     })
+
+    console.log('API key Generated #1:', response)
 
     const data = await response.json()
 

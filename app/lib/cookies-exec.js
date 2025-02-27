@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers'
 
 export async function getCookieData(){
-    const cookieData= cookies().getAll()
+    const cookieData= (await cookies()).getAll()
     return new Promise((resolve) =>
       setTimeout(() => {
         resolve(cookieData)

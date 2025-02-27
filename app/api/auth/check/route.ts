@@ -8,7 +8,7 @@ export async function GET() {
     const cookieData = cookieStore.find((cookie) => cookie.name === 'auth-token')
     const authToken = cookieData?.value;
 
-    if (!authToken || !authToken.value) {
+    if (!cookieData || !authToken) {
       return NextResponse.json(
         { success: false, message: 'No authentication found' },
         { status: 401 }

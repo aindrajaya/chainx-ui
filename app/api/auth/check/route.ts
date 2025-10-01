@@ -1,38 +1,50 @@
 // app/api/auth/check/route.ts
-import { NextResponse } from 'next/server'
-import { getCookieData } from '../../../lib/cookies-exec'
+import { NextRequest, NextResponse } from 'next/server'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const cookieStore = await getCookieData()
-    const cookieData = cookieStore.find((cookie) => cookie.name === 'auth-token')
-    const authToken = cookieData?.value;
+    // Get session cookie from the request
+    const sessionCookie = request.cookies.get('chainx.sid')
+    const userIdCookie = request.cookies.get('userId')
+    console.log("SESSION GET: ", sessionCookie)
 
-    if (!cookieData || !authToken) {
+    if (!sessionCookie) {
       return NextResponse.json(
-        { success: false, message: 'No authentication found' },
+        { success: false, message: 'No session found' },
         { status: 401 }
       )
     }
 
-    // Since we have the userId stored in the auth-token cookie,
-    // we can consider the user authenticated if the cookie exists
+    // Validate session by calling a protected backend endpoint
+    // Use /v1/user-api-keys which requires session authentication
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/user-api-keys`, {
+      method: 'GET',
+      headers: {
+        'Cookie': `chainx.sid=${sessionCookie.value}`,
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Ensures cookies are sent
+    })
+
+    if (!response.ok) {
+      return NextResponse.json(
+        { success: false, message: 'Session invalid' },
+        { status: 401 }
+      )
+    }
+
     return NextResponse.json({
       success: true,
-      userId: authToken.value,
-      message: 'Authentication valid'
+      userId: userIdCookie?.value,
+      message: 'Session valid'
     })
 
   } catch (error) {
     console.error('Auth check error:', error)
-    
-    // Clear the cookie on error and return unauthorized
-    const errorResponse = NextResponse.json(
-      { success: false, message: 'Authentication failed' },
-      { status: 401 }
+    return NextResponse.json(
+      { success: false, message: 'Authentication check failed' },
+      { status: 500 }
     )
-    errorResponse.cookies.delete('auth-token')
-    return errorResponse
   }
 }
 

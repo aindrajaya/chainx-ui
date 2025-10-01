@@ -251,7 +251,7 @@ export default function AuthPage() {
 
           <p className="text-center text-sm text-gray-600">
             Don't have an account?{' '}
-            <Link href="/register" className="font-medium text-primary hover:text-green-600 transition-colors">
+            <Link href="/auth/register" className="font-medium text-primary hover:text-green-600 transition-colors">
               Sign up
             </Link>
           </p>

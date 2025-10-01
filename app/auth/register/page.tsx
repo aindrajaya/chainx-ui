@@ -2,20 +2,30 @@
 
 import Link from "next/link"
 import { useState } from "react"
-import { ArrowLeft, Mail, CheckCircle } from 'lucide-react'
+import { useRouter } from "next/navigation"
+import { Eye, EyeOff, Shield, Activity, ArrowRight, CheckCircle } from 'lucide-react'
 import Image from "next/image"
 
 interface FormData {
+  name: string
   email: string
+  password: string
+  confirmPassword: string
 }
 
-export default function ForgotPasswordPage() {
+export default function RegisterPage() {
   const [formData, setFormData] = useState({
-    email: ""
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: ""
   })
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
+  const router = useRouter()
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -31,25 +41,39 @@ export default function ForgotPasswordPage() {
     setError('')
 
     try {
-      if (!formData.email) {
-        setError("Please enter your email address")
+      if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+        setError("Please fill in all fields")
         return
       }
 
-      const response = await fetch('/api/forgot-password', {
+      if (formData.password !== formData.confirmPassword) {
+        setError("Passwords do not match")
+        return
+      }
+
+      if (formData.password.length < 8) {
+        setError("Password must be at least 8 characters long")
+        return
+      }
+
+      const response = await fetch('/api/register', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: formData.email }),
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password
+        }),
       })
 
       const data = await response.json()
 
       if (response.ok) {
-        // Success - API returns just a message on success
+        // Success - registration successful, show verification message
         setSuccess(true)
       } else {
         // Error - API returns error message
-        throw new Error(data.error || data.message || "Failed to send reset email")
+        throw new Error(data.error || data.message || "Registration failed")
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred. Please try again.")
@@ -88,29 +112,28 @@ export default function ForgotPasswordPage() {
               </div>
               <h2 className="text-3xl font-bold text-gray-900">Check your email</h2>
               <p className="mt-2 text-gray-600">
-                We've sent a password reset link to <strong>{formData.email}</strong>
+                We've sent a verification code to <strong>{formData.email}</strong>
               </p>
             </div>
 
             <div className="bg-white p-8 rounded-xl shadow-sm space-y-4">
               <p className="text-sm text-gray-600 text-center">
-                Didn't receive the email? Check your spam folder or{" "}
-                <button
-                  onClick={() => setSuccess(false)}
-                  className="text-primary hover:text-green-600 font-medium"
-                >
-                  try again
-                </button>
+                Please check your email and click the verification link to complete your registration.
               </p>
-
               <Link
-                href="/auth/signin"
+                href="/auth/verify-email"
                 className="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-lg text-white bg-primary hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
               >
-                <ArrowLeft className="h-5 w-5 mr-2" />
-                Back to sign in
+                Go to Email Verification
               </Link>
             </div>
+
+            <p className="text-center text-sm text-gray-600">
+              Already have an account?{' '}
+              <Link href="/auth/signin" className="font-medium text-primary hover:text-green-600 transition-colors">
+                Sign in
+              </Link>
+            </p>
           </div>
         </div>
       </div>
@@ -134,6 +157,18 @@ export default function ForgotPasswordPage() {
               Your trusted solution for smart contract security and API key management
             </p>
           </div>
+
+          <div className="grid grid-cols-2 gap-6">
+            {[
+              { icon: Shield, text: "Enterprise Security" },
+              { icon: Activity, text: "Real-time Monitoring" },
+            ].map((item, index) => (
+              <div key={index} className="flex items-center space-x-3 text-white/90">
+                <item.icon className="h-5 w-5" />
+                <span className="text-sm">{item.text}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -141,14 +176,28 @@ export default function ForgotPasswordPage() {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div className="w-full max-w-md space-y-8">
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-gray-900">Forgot your password?</h2>
-            <p className="mt-2 text-gray-600">
-              Enter your email address and we'll send you a link to reset your password.
-            </p>
+            <h2 className="text-3xl font-bold text-gray-900">Create your account</h2>
+            <p className="mt-2 text-gray-600">Join ChainX to get started</p>
           </div>
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-6 bg-white p-8 rounded-xl shadow-sm">
             <div className="space-y-4">
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                  Full Name
+                </label>
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                  placeholder="John Doe"
+                />
+              </div>
+
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                   Email address
@@ -165,6 +214,56 @@ export default function ForgotPasswordPage() {
                 />
               </div>
 
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                  Password
+                </label>
+                <div className="mt-1 relative">
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                  Confirm Password
+                </label>
+                <div className="mt-1 relative">
+                  <input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    required
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+              </div>
+
               {error && (
                 <div className="bg-red-50 text-red-500 text-sm p-3 rounded-lg">
                   {error}
@@ -179,12 +278,12 @@ export default function ForgotPasswordPage() {
                 {isLoading ? (
                   <span className="flex items-center space-x-2">
                     <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full" />
-                    <span>Sending...</span>
+                    <span>Creating account...</span>
                   </span>
                 ) : (
                   <span className="flex items-center space-x-2">
-                    <Mail className="h-5 w-5" />
-                    <span>Send reset link</span>
+                    <span>Create account</span>
+                    <ArrowRight className="h-5 w-5" />
                   </span>
                 )}
               </button>
@@ -192,7 +291,7 @@ export default function ForgotPasswordPage() {
           </form>
 
           <p className="text-center text-sm text-gray-600">
-            Remember your password?{' '}
+            Already have an account?{' '}
             <Link href="/auth/signin" className="font-medium text-primary hover:text-green-600 transition-colors">
               Sign in
             </Link>

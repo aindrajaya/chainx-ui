@@ -25,6 +25,8 @@ export function useAuth() {
         method: 'GET',
         credentials: 'include',
       })
+
+      // console.log("DATA FROM AUTH: ", await response.json())
       
       if (response.ok) {
         const data = await response.json()
@@ -45,25 +47,20 @@ export function useAuth() {
 
   const login = async (email: string, password: string) => {
     try {
-      // Call your actual login endpoint
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/login`, {
+      // Call our API route which proxies to the backend
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Include cookies for session handling
         body: JSON.stringify({ email, password }),
       })
 
       if (!response.ok) {
-        throw new Error('Login failed')
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Login failed')
       }
 
       const data: LoginResponse = await response.json()
-
-      // Set the auth cookie through our own API route
-      await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: data.userId }),
-      })
       
       setIsAuthenticated(true)
       setUserId(data.userId)

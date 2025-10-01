@@ -312,8 +312,37 @@ Confidence: High | Gas Impact: Low
               <div className="flex items-center gap-2"><Check className="size-4 text-primary" /> Shareable PDF reports</div>
               <div className="flex items-center gap-2"><Check className="size-4 text-primary" /> Email support</div>
             </CardContent>
-            <CardFooter>
-              <Button className="w-full">Start Starter</Button>
+            <CardFooter className="flex flex-col gap-2">
+              <Button
+                className="w-full"
+                onClick={async () => {
+                  try {
+                    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/v1/subscription/create`, {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        // Add auth header if needed
+                      },
+                      body: JSON.stringify({
+                        userId: 'user-id-here', // Replace with actual user ID
+                        email: email,
+                      }),
+                    });
+                    const data = await response.json();
+                    if (data.approvalUrl) {
+                      window.location.href = data.approvalUrl;
+                    } else {
+                      alert('Subscription created successfully!');
+                    }
+                  } catch (error) {
+                    console.error('Subscription error:', error);
+                    alert('Failed to create subscription');
+                  }
+                }}
+              >
+                Subscribe with PayPal
+              </Button>
+              <div className="text-xs text-muted-foreground text-center">Subscribe using your PayPal account</div>
             </CardFooter>
           </Card>
 

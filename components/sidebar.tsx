@@ -8,7 +8,7 @@ import Image from "next/image"
 const navItems = [
   { 
     name: "Initial Page", 
-    href: "/dashboard/init", 
+    href: "/dashboard", 
     icon: Home,
     isActive: true,
     isAvailable: true

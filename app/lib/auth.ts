@@ -64,7 +64,7 @@ export function useAuth() {
       
       setIsAuthenticated(true)
       setUserId(data.userId)
-      router.push('/dashboard/init')
+      router.push('/dashboard')
       
       return data
     } catch (error) {

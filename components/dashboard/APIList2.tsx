@@ -368,7 +368,25 @@ export default function ApiList() {
   }
 
   return (
-    <div className="max-w-8xl mx-auto p-6 space-y-6">
+    <div className="max-w-4xl mx-auto p-6 space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <h1 className="text-xl font-semibold text-gray-900">API Keys</h1>
+        <button
+          onClick={() => setIsDialogOpen(true)}
+          disabled={isGenerating}
+          className={`inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg transition-colors
+            ${isGenerating ? 'opacity-75 cursor-not-allowed' : 'hover:bg-green-700'}`}
+        >
+          {isGenerating ? (
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          ) : (
+            <Plus className="h-4 w-4 mr-2" />
+          )}
+          {isGenerating ? 'Generating...' : 'Generate New Key'}
+        </button>
+      </div>
+
       {/* Error Message */}
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">

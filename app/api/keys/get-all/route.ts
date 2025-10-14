@@ -42,6 +42,7 @@ export async function GET(request: NextRequest) {
       }
 
       const data = await response.json()
+      console.log("DATA RECEIVED: ", data.data)
 
       // Backend returns full response object with success, message, and data
       if (!data.success) {

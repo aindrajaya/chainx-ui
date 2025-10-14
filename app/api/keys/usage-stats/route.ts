@@ -38,6 +38,7 @@ export async function GET(request: NextRequest) {
     let data
     try {
       data = await response.json()
+      console.log("DATA USAGE: ", data.data)
     } catch (parseError) {
       console.error('Failed to parse response as JSON:', parseError)
       return NextResponse.json(

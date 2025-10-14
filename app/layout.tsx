@@ -37,12 +37,7 @@ export default function RootLayout({
       <head>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
       </head>
-      <body className="antialiased">
-        {/* Initialize theme early to avoid flash */}
-        <Script id="theme-init" strategy="beforeInteractive">
-          {`try{const t=localStorage.getItem("theme");const m=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;const th=t||("dark");const root=document.documentElement; if((t? t: (m?"dark":"light"))==="dark"){root.classList.add("dark");}else{root.classList.remove("dark");}}catch(e){}}
-          `}
-        </Script>
+      <body className="antialiased" suppressHydrationWarning>
         <ErrorReporter />
         <Script
           src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/scripts//route-messenger.js"

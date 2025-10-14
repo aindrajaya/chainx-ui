@@ -89,7 +89,7 @@ export default function AuthPage() {
           localStorage.setItem("rememberMe", "true")
         }
   
-        router.push("/dashboard/init")
+        router.push("/dashboard")
       } else {
         setError(data.message || "Invalid credentials")
       }

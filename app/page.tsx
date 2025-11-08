@@ -3,18 +3,28 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, Shield, Sparkles, ArrowRight, MessageSquare, FileSearch, BarChart3, Lock, Zap, Mail, MapPin } from "lucide-react";
+import { Check, Shield, Sparkles, ArrowRight, MessageSquare, FileSearch, BarChart3, Lock, Zap, Mail, MapPin, ShieldCheck, Construction, Code2, Github, GitPullRequest, Link2 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ThemeToggle from "@/components/theme-toggle";
 import Header from "@/components/ui/Header";
 import Image from "next/image";
 
 export default function HomePage() {
   const [email, setEmail] = useState("");
+  const [reportFormat, setReportFormat] = useState("markdown");
+  const [markdownContent, setMarkdownContent] = useState("");
+
+  useEffect(() => {
+    if (reportFormat === "markdown") {
+      fetch("/sample-report.md")
+        .then((res) => res.text())
+        .then((text) => setMarkdownContent(text));
+    }
+  }, [reportFormat]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground dark:bg-[#0D1117]">
       {/* Navigation */}
       {/* <header className="sticky top-0 z-50 backdrop-blur supports-[backdrop-filter]:bg-background/60 bg-background/80 border-b">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -39,337 +49,277 @@ export default function HomePage() {
       </header> */}
       <Header />
 
-      {/* Hero */}
-      <section className="relative overflow-hidden border-b">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60rem_40rem_at_top_right,theme(colors.primary)/6%,transparent_60%)] dark:bg-[radial-gradient(60rem_40rem_at_top_right,theme(colors.primary)/12%,transparent_60%)]" />
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 md:py-28 relative">
-          <div className="grid lg:grid-cols-2 gap-10 items-center">
-            <div className="space-y-6 text-center lg:text-left">
-              <Badge className="gap-2 w-fit mx-auto lg:mx-0" variant="secondary">
-                <Sparkles className="size-4" /> AI-powered Smart Contract Security
-              </Badge>
-              <h1 className="text-4xl md:text-6xl font-semibold tracking-tight leading-tight">
-                Ship faster with autonomous audits for your Web3 code
-              </h1>
-              <p className="text-muted-foreground text-lg max-w-xl">
-                ChainX continuously analyzes Solidity, Vyper, and Rust smart contracts to detect vulnerabilities before they cost you. Instant insights, actionable fixes, and shareable reports.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
-                <div className="flex w-full sm:w-auto items-center gap-2 bg-secondary border rounded-md px-2 pr-2">
-                  <input
-                    type="email"
-                    placeholder="Your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="h-11 w-full sm:w-72 bg-transparent outline-none px-2"
-                  />
-                  <Button onClick={() => alert(`Thanks! We'll reach out at ${email || "your email"}.`)}>
-                    Join waitlist
-                  </Button>
+      
+      <main>
+        {/* Hero */}
+        <section className="bg-background dark:bg-[#0D1117] border-b border-gray-800">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24 md:py-32">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+              {/* Left Column: Text Content */}
+              <div className="text-center md:text-left">
+                <p className="font-semibold text-green-400 mb-2">ChainX Insider</p>
+                <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
+                  The Ultimate Blockchain Scanner for Real-Time Analysis
+                </h1>
+                <p className="text-muted-foreground text-lg mb-8">
+                  Smart Contract Security Scanning Made Simple, Easy, & Safe just few seconds in your workspace.
+                </p>
+                <div className="flex flex-col sm:flex-row justify-center md:justify-start gap-4">
+                  <Link
+                    href="/auth/register"
+                    className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors text-center"
+                  >
+                    Try for free
+                  </Link>
+                  <Link
+                    href="#features"
+                    className="bg-secondary hover:bg-secondary/80 border text-secondary-foreground font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
+                  >
+                    Explore Use Case <span>&rarr;</span>
+                  </Link>
                 </div>
-                <Link href="#how" className="inline-flex">
-                  <Button variant="outline" className="w-full sm:w-auto gap-2 h-12">
-                    See how it works <ArrowRight className="size-4" />
-                  </Button>
-                </Link>
               </div>
-              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6 pt-2 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2"><Lock className="size-4" /> SOC2-ready practices</div>
-                <div className="flex items-center gap-2"><Zap className="size-4" /> CI/CD integrations</div>
-              </div>
-            </div>
-            <div className="relative">
-              <div className="relative rounded-xl border bg-card shadow-sm overflow-hidden">
+
+              {/* Right Column: Image */}
+              <div className="flex justify-center">
                 <img
-                  // src="https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=1600&auto=format&fit=crop"
-                  src="/hero1.png"
-                  alt="Code security dashboard"
-                  className="w-full h-[400px] object-cover"
+                  src="/images-animation.svg"
+                  alt="A code editor showing smart contract analysis by ChainX"
+                  width={600}
+                  height={450}
+                  className="rounded-lg dark:shadow-2xl dark:shadow-green-900/20"
                 />
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-background/90 to-transparent p-4">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Shield className="size-4 text-primary" /> Real-time static + symbolic analysis
-                  </div>
-                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* How it works */}
-      <section id="how" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 md:py-24">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">How ChainX works</h2>
-          <p className="text-muted-foreground mt-3 max-w-2xl mx-auto">From submission to detailed findings in minutes. Our AI-powered platform makes smart contract security audits fast, accurate, and actionable.</p>
-        </div>
-
-        {/* Step-by-step process - improved layout */}
-        <div className="relative max-w-5xl mx-auto">
-          {/* Desktop connection line */}
-          <div className="hidden lg:block absolute top-8 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/20 via-primary/40 to-primary/20"></div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
-            {[
-              {
-                step: 1,
-                title: "Submit",
-                description: "Upload your repo, paste code, or connect GitHub. Choose EVM/Vyper/Rust targets.",
-                icon: <FileSearch className="size-6" />,
-                gradient: "from-green-700 to-green-800"
-              },
-              {
-                step: 2,
-                title: "Analyze",
-                description: "AI + formal methods run static analysis, test generation, and symbolic execution.",
-                icon: <BarChart3 className="size-6" />,
-                gradient: "from-green-700 to-green-800"
-              },
-              {
-                step: 3,
-                title: "Report",
-                description: "Get prioritized findings with proofs of exploit, code paths, and suggested fixes.",
-                icon: <MessageSquare className="size-6" />,
-                gradient: "from-green-600 to-green-700"
-              }
-            ].map((step, index) => (
-              <div key={step.step} className="relative flex flex-col items-center text-center group">
-                {/* Step number */}
-                <div className={`relative inline-flex size-16 items-center justify-center rounded-full bg-gradient-to-r ${step.gradient} text-white font-bold text-xl mb-6 shadow-lg group-hover:scale-110 transition-all duration-300 z-10`}>
-                  {step.step}
-                  {/* Pulse effect */}
-                  <div className={`absolute inset-0 rounded-full bg-gradient-to-r ${step.gradient} animate-ping opacity-20`}></div>
+        {/* Features Section */}
+        <section id="features" aria-labelledby="features-heading" className="bg-background dark:bg-[#0D1117] py-24 sm:py-32">
+          <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <p className="font-semibold text-green-400">Productivity</p>
+              <h2 id="features-heading" className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+                Enhanced Security & Efficiency with Real-time Scanner
+              </h2>
+            </div>
+            <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+              {[
+                {
+                  name: 'Unprecedented Security Realtime',
+                  description: 'Our scanner ensures that your platform remains resistant to unauthorized access, tampering, and data breaches.',
+                  icon: ShieldCheck,
+                },
+                {
+                  name: 'Trustworthy Data Integrity',
+                  description: 'With our Blockchain Scanner, you can guarantee the integrity of your data by leveraging blockchain\'s immutability.',
+                  icon: Lock,
+                },
+                {
+                  name: 'Seamless Integration & Scalability',
+                  description: 'Our scanner can be easily integrated into your system, ensuring a smooth and hassle-free implementation process.',
+                  icon: Code2,
+                },
+                {
+                  name: 'Streamlined Compliance',
+                  description: 'Our Systems simplifies the compliance process by automatically auditing and tracking.',
+                  icon: Construction,
+                },
+              ].map((feature) => (
+                <div key={feature.name} className="bg-secondary/50 dark:bg-[#161B22] p-8 rounded-lg border">
+                  <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-secondary dark:bg-gray-800 mb-6">
+                    <feature.icon className="h-6 w-6 text-green-400" aria-hidden="true" />
+                  </div>
+                  <h3 className="text-lg font-semibold">{feature.name}</h3>
+                  <p className="mt-2 text-base text-muted-foreground">{feature.description}</p>
                 </div>
-
-                {/* Card */}
-                <Card className="w-full h-full group-hover:shadow-2xl group-hover:-translate-y-1 transition-all duration-500 border-2 group-hover:border-primary/30 bg-card/50 backdrop-blur-sm">
-                  <CardHeader className="pb-4">
-                    <div className="flex items-center justify-center gap-3 mb-2">
-                      <div className={`p-3 rounded-xl bg-gradient-to-r ${step.gradient} text-white shadow-lg`}>
-                        {step.icon}
-                      </div>
-                    </div>
-                    <CardTitle className="text-xl font-semibold">{step.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <p className="text-muted-foreground leading-relaxed">{step.description}</p>
-                  </CardContent>
-                </Card>
-
-                {/* Mobile arrow */}
-                {index < 2 && (
-                  <div className="md:hidden flex justify-center my-8">
-                    <ArrowRight className="size-6 text-primary/60 animate-bounce" />
-                  </div>
-                )}
-
-                {/* Desktop arrow */}
-                {index < 2 && (
-                  <div className="hidden lg:block absolute top-8 -right-6 z-20">
-                    <div className="relative">
-                      <ArrowRight className="size-8 text-primary group-hover:text-primary/80 transition-colors duration-300" />
-                      <div className="absolute inset-0 animate-pulse">
-                        <ArrowRight className="size-8 text-primary/30" />
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        </section>
 
-        {/* Enhanced feature highlights */}
-        <div className="mt-20">
+        {/* Workflow Integration Section */}
+        <section id="workflow" aria-labelledby="workflow-heading" className="bg-background dark:bg-[#0D1117] py-24 sm:py-32">
+          <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <h2 id="workflow-heading" className="text-3xl font-bold tracking-tight sm:text-4xl">
+                Seamless Integration with Your Workflow
+              </h2>
+              <p className="mt-4 text-lg text-muted-foreground">
+                ChainX works directly within your development environment, eliminating context switching and making security a natural part of the development process.
+              </p>
+            </div>
+
+            <div className="mt-16 flex justify-center items-center space-x-8">
+              <Github className="h-12 w-12" />
+              <div className="flex-grow h-px bg-green-500/50 relative">
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 p-2 bg-blue-500/20 rounded-full">
+                  <Link2 className="h-6 w-6 text-green-400" />
+                </div>
+              </div>
+              <Zap className="h-12 w-12" />
+            </div>
+
+            <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-3">
+              <div className="bg-secondary/50 dark:bg-[#161B22] p-8 rounded-lg border">
+                <GitPullRequest className="h-8 w-8 text-green-400 mb-4" />
+                <h3 className="text-lg font-semibold">GitHub Integration</h3>
+                <p className="mt-2 text-base text-muted-foreground">Automated security scans on every pull request.</p>
+              </div>
+              <div className="bg-secondary/50 dark:bg-[#161B22] p-8 rounded-lg border">
+                <Code2 className="h-8 w-8 text-green-400 mb-4" />
+                <h3 className="text-lg font-semibold">VS Code Extension</h3>
+                <p className="mt-2 text-base text-muted-foreground">Get real-time vulnerability feedback directly in your editor.</p>
+              </div>
+              <div className="bg-secondary/50 dark:bg-[#161B22] p-8 rounded-lg border">
+                <Zap className="h-8 w-8 text-blue-400 mb-4" />
+                <h3 className="text-lg font-semibold">Effortless Setup</h3>
+                <p className="mt-2 text-base text-muted-foreground">Connect your accounts in minutes and start scanning immediately.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Security report mockup */}
+        <section id="report" aria-labelledby="report-heading" className="bg-secondary/50 dark:bg-[#0D1117] border-y">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+            <div className="grid lg:grid-cols-2 gap-8 items-stretch">
+              <div className="space-y-4">
+                <h2 id="report-heading" className="text-2xl md:text-3xl font-semibold tracking-tight">Security report preview</h2>
+                <p className="text-muted-foreground">An example of what your team receives after each analysis run.</p>
+                <ul className="space-y-3">
+                  {["Reentrancy vulnerability in Vault.withdraw()", "Unchecked call return value in Token.mint()", "Insecure randomness source in Lottery.draw()"].map((t, i) => (
+                    <li key={i} className="flex items-start gap-2">
+                      <Check className="mt-0.5 size-4 text-primary" />
+                      <span>{t}</span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="pt-2">
+                  <Button>Request a sample report</Button>
+                </div>
+              </div>
+              <Card className="overflow-hidden">
+                <CardHeader className="border-b flex flex-row items-center justify-between">
+                  <CardTitle className="text-base">
+                    {reportFormat === "markdown" ? "findings.md" : "report.pdf"}
+                  </CardTitle>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      variant={reportFormat === "markdown" ? "secondary" : "ghost"}
+                      onClick={() => setReportFormat("markdown")}
+                    >
+                      Markdown
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant={reportFormat === "pdf" ? "secondary" : "ghost"}
+                      onClick={() => setReportFormat("pdf")}
+                    >
+                      PDF
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-0">
+                  {reportFormat === "markdown" ? (
+                    <pre className="m-0 p-4 text-sm overflow-auto leading-relaxed bg-card dark:bg-[#161B22] h-[400px]">
+                      {markdownContent}
+                    </pre>
+                  ) : (
+                    <div className="h-[400px]">
+                      <iframe src="/sample-report.pdf" width="100%" height="100%" />
+                    </div>
+                  )}
+                </CardContent>
+                <CardFooter className="border-t text-xs text-muted-foreground">
+                  Generated by ChainX AI • EVM target • Solidity 0.8.x
+                </CardFooter>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        {/* Pricing */}
+        <section id="pricing" aria-labelledby="pricing-heading" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 md:py-24">
           <div className="text-center mb-12">
-            <h3 className="text-2xl md:text-3xl font-semibold tracking-tight">Why Choose ChainX?</h3>
-            <p className="text-muted-foreground mt-3">Advanced security analysis powered by cutting-edge AI</p>
+            <h2 id="pricing-heading" className="text-3xl md:text-4xl font-semibold tracking-tight">Simple pricing</h2>
+            <p className="text-muted-foreground mt-3">Start auditing today. Upgrade anytime.</p>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-            {[
-              {
-                icon: <Shield className="size-8" />,
-                title: "Deep static analysis",
-                desc: "Detect reentrancy, overflows, access control flaws, and more with comprehensive vulnerability scanning.",
-                gradient: "from-green-700 to-green-800"
-              },
-              {
-                icon: <Zap className="size-8" />,
-                title: "Risk scoring",
-                desc: "CVSS-like severity with gas and exploitability metrics for prioritized remediation.",
-                gradient: "from-green-700 to-green-800"
-              },
-              {
-                icon: <Check className="size-8" />,
-                title: "Actionable fixes",
-                desc: "Human-readable patch suggestions and references to resolve issues quickly.",
-                gradient: "from-green-600 to-green-700"
-              }
-            ].map((feature, i) => (
-              <div key={i} className="group relative overflow-hidden rounded-2xl border bg-card p-6 hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
-                {/* Background gradient on hover */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`} />
-
-                <div className="relative">
-                  <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-r ${feature.gradient} text-white mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-lg`}>
-                    {feature.icon}
-                  </div>
-                  <h4 className="text-lg font-semibold mb-3">{feature.title}</h4>
-                  <p className="text-muted-foreground leading-relaxed">{feature.desc}</p>
+          <div className="grid md:grid-cols-2 gap-6 items-stretch">
+            {/* $15/month */}
+            <Card className="relative">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Starter</CardTitle>
+                  <Badge>Most popular</Badge>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Call to action */}
-        <div className="text-center mt-16">
-          <div className="inline-flex flex-col sm:flex-row items-center gap-4 p-8 rounded-2xl bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/20 shadow-lg">
-            <div className="text-center sm:text-left">
-              <h4 className="font-semibold text-xl mb-2">Ready to secure your contracts?</h4>
-              <p className="text-muted-foreground">Get started with ChainX today and ship with confidence</p>
-            </div>
-            <Button size="lg" className="gap-2 px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
-              Start Free Trial <ArrowRight className="size-5" />
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Security report mockup */}
-      <section id="report" className="bg-secondary/50 border-y">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 md:py-24">
-          <div className="grid lg:grid-cols-2 gap-8 items-stretch">
-            <div className="space-y-4">
-              <h3 className="text-2xl md:text-3xl font-semibold tracking-tight">Security report preview</h3>
-              <p className="text-muted-foreground">An example of what your team receives after each analysis run.</p>
-              <ul className="space-y-3">
-                {["Reentrancy vulnerability in Vault.withdraw()", "Unchecked call return value in Token.mint()", "Insecure randomness source in Lottery.draw()"].map((t, i) => (
-                  <li key={i} className="flex items-start gap-2">
-                    <Check className="mt-0.5 size-4 text-primary" />
-                    <span>{t}</span>
-                  </li>
-                ))}
-              </ul>
-              <div className="pt-2">
-                <Button>Request a sample report</Button>
-              </div>
-            </div>
-            <Card className="overflow-hidden">
-              <CardHeader className="border-b">
-                <CardTitle className="text-base">findings.md</CardTitle>
+                <div className="mt-2 text-4xl font-semibold tracking-tight">$15<span className="text-lg font-normal text-muted-foreground">/month</span></div>
               </CardHeader>
-              <CardContent className="p-0">
-                <pre className="m-0 p-4 text-sm overflow-auto leading-relaxed bg-card">
-{`# ChainX Audit Findings
-
-## [CRITICAL] Reentrancy in Vault.withdraw()
-- Impact: Attacker drains funds via reentrant callback
-- Recommendation: Add reentrancy guard and checks-effects-interactions pattern
-
-## [HIGH] Access control bypass in Admin.upgrade()
-- Impact: Unauthorized upgrades possible
-- Recommendation: Use onlyOwner and multi-sig confirmation
-
-## [MEDIUM] Integer overflow in Reward.calculate()
-- Impact: Reward inflation under edge conditions
-- Recommendation: Use SafeMath or solidity ^0.8 checked arithmetic
-
----
-Summary: 3 issues (1 Critical, 1 High, 1 Medium)
-Confidence: High | Gas Impact: Low
-`}
-                </pre>
+              <CardContent className="space-y-2 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2"><Check className="size-4 text-primary" /> Unlimited analyses on small repos</div>
+                <div className="flex items-center gap-2"><Check className="size-4 text-primary" /> Autogenerated fix suggestions</div>
+                <div className="flex items-center gap-2"><Check className="size-4 text-primary" /> Shareable PDF reports</div>
+                <div className="flex items-center gap-2"><Check className="size-4 text-primary" /> Email support</div>
               </CardContent>
-              <CardFooter className="border-t text-xs text-muted-foreground">
-                Generated by ChainX AI • EVM target • Solidity 0.8.x
+              <CardFooter className="flex flex-col gap-2">
+                <Button
+                  className="w-full"
+                  onClick={async () => {
+                    try {
+                      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/v1/subscription/create`, {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          // Add auth header if needed
+                        },
+                        body: JSON.stringify({
+                          userId: 'user-id-here', // Replace with actual user ID
+                          email: email,
+                        }),
+                      });
+                      const data = await response.json();
+                      if (data.approvalUrl) {
+                        window.location.href = data.approvalUrl;
+                      } else {
+                        alert('Subscription created successfully!');
+                      }
+                    } catch (error) {
+                      console.error('Subscription error:', error);
+                      alert('Failed to create subscription');
+                    }
+                  }}
+                >
+                  Subscribe with PayPal
+                </Button>
+                <div className="text-xs text-muted-foreground text-center">Subscribe using your PayPal account</div>
+              </CardFooter>
+            </Card>
+
+            {/* $50/month - Coming Soon */}
+            <Card className="relative opacity-90">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Pro</CardTitle>
+                  <Badge variant="outline" className="border-dashed">Coming soon</Badge>
+                </div>
+                <div className="mt-2 text-4xl font-semibold tracking-tight">$50<span className="text-lg font-normal text-muted-foreground">/month</span></div>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2"><Check className="size-4 text-primary" /> Large monorepo support</div>
+                <div className="flex items-center gap-2"><Check className="size-4 text-primary" /> CI/CD & GitHub checks</div>
+                <div className="flex items-center gap-2"><Check className="size-4 text-primary" /> Custom rules & policy gates</div>
+                <div className="flex items-center gap-2"><Check className="size-4 text-primary" /> Priority support</div>
+              </CardContent>
+              <CardFooter>
+                <Button variant="outline" disabled className="w-full">Join waitlist</Button>
               </CardFooter>
             </Card>
           </div>
-        </div>
-      </section>
-
-      {/* Pricing */}
-      <section id="pricing" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 md:py-24">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">Simple pricing</h2>
-          <p className="text-muted-foreground mt-3">Start auditing today. Upgrade anytime.</p>
-        </div>
-        <div className="grid md:grid-cols-2 gap-6 items-stretch">
-          {/* $15/month */}
-          <Card className="relative">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Starter</CardTitle>
-                <Badge>Most popular</Badge>
-              </div>
-              <div className="mt-2 text-4xl font-semibold tracking-tight">$15<span className="text-lg font-normal text-muted-foreground">/month</span></div>
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2"><Check className="size-4 text-primary" /> Unlimited analyses on small repos</div>
-              <div className="flex items-center gap-2"><Check className="size-4 text-primary" /> Autogenerated fix suggestions</div>
-              <div className="flex items-center gap-2"><Check className="size-4 text-primary" /> Shareable PDF reports</div>
-              <div className="flex items-center gap-2"><Check className="size-4 text-primary" /> Email support</div>
-            </CardContent>
-            <CardFooter className="flex flex-col gap-2">
-              <Button
-                className="w-full"
-                onClick={async () => {
-                  try {
-                    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/v1/subscription/create`, {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json',
-                        // Add auth header if needed
-                      },
-                      body: JSON.stringify({
-                        userId: 'user-id-here', // Replace with actual user ID
-                        email: email,
-                      }),
-                    });
-                    const data = await response.json();
-                    if (data.approvalUrl) {
-                      window.location.href = data.approvalUrl;
-                    } else {
-                      alert('Subscription created successfully!');
-                    }
-                  } catch (error) {
-                    console.error('Subscription error:', error);
-                    alert('Failed to create subscription');
-                  }
-                }}
-              >
-                Subscribe with PayPal
-              </Button>
-              <div className="text-xs text-muted-foreground text-center">Subscribe using your PayPal account</div>
-            </CardFooter>
-          </Card>
-
-          {/* $50/month - Coming Soon */}
-          <Card className="relative opacity-90">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Pro</CardTitle>
-                <Badge variant="outline" className="border-dashed">Coming soon</Badge>
-              </div>
-              <div className="mt-2 text-4xl font-semibold tracking-tight">$50<span className="text-lg font-normal text-muted-foreground">/month</span></div>
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2"><Check className="size-4 text-primary" /> Large monorepo support</div>
-              <div className="flex items-center gap-2"><Check className="size-4 text-primary" /> CI/CD & GitHub checks</div>
-              <div className="flex items-center gap-2"><Check className="size-4 text-primary" /> Custom rules & policy gates</div>
-              <div className="flex items-center gap-2"><Check className="size-4 text-primary" /> Priority support</div>
-            </CardContent>
-            <CardFooter>
-              <Button variant="outline" disabled className="w-full">Join waitlist</Button>
-            </CardFooter>
-          </Card>
-        </div>
-      </section>
-
+        </section>
+      </main>
       {/* Footer */}
-      <footer id="contact" className="border-t bg-muted/50 dark:bg-[#181818] text-foreground backdrop-blur-sm">
+      <footer id="contact" className="border-t bg-muted/50 dark:bg-[#0D1117] text-foreground backdrop-blur-sm">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
           {/* Main Footer Content */}
           <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-12 mb-12">
@@ -438,8 +388,8 @@ Confidence: High | Gas Impact: Low
                   <Mail className="size-4 text-muted-foreground mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="text-foreground text-sm font-medium">Email</p>
-                    <a href="mailto:hello@chainx.ai" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
-                      hello@chainx.ai
+                    <a href="mailto:hello@chainx.id" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
+                      hello@chainx.id
                     </a>
                   </div>
                 </div>
@@ -447,8 +397,8 @@ Confidence: High | Gas Impact: Low
                   <MessageSquare className="size-4 text-muted-foreground mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="text-foreground text-sm font-medium">Support</p>
-                    <a href="mailto:support@chainx.ai" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
-                      support@chainx.ai
+                    <a href="mailto:support@chainx.id" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
+                      support@chainx.id
                     </a>
                   </div>
                 </div>

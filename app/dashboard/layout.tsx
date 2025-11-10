@@ -4,7 +4,7 @@ import Footer from "../../components/Footer"
 import Header from "../../components/Header"
 import Sidebar from "../../components/sidebar"
 import { ThemeProvider } from "../../components/theme-provider"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import {useEffect} from "react"
 import { useAuth } from "../lib/auth"
 
@@ -17,6 +17,7 @@ export default function DashboardLayout({
 }) {
     const { isLoading, isAuthenticated } = useAuth()
     const router = useRouter()
+    const pathname = usePathname()
   
     useEffect(() => {
       if (!isLoading && !isAuthenticated) {
@@ -51,7 +52,7 @@ export default function DashboardLayout({
             <Sidebar />
             <div className="flex-1 flex flex-col overflow-hidden">
                 <Header />
-                <main className="flex-1 overflow-y-auto p-6">
+                <main key={pathname} className="flex-1 overflow-y-auto p-6">
                     {children}
                 </main>
                     

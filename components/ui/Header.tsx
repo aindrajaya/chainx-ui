@@ -120,7 +120,12 @@ export default function Header() {
             <div className="flex items-center gap-3">
               <ThemeToggle />
               <Button variant="ghost" className="hidden sm:inline-flex cursor-pointer" onClick={() => router.push('/auth/signin')}>Sign in</Button>
-              <Button className="inline-flex cursor-pointer">Get started</Button>
+              <Button
+                className="inline-flex cursor-pointer"
+                onClick={() => router.push('/auth/register')}
+              >
+                Get started
+              </Button>
             </div>
           )}
 
@@ -187,9 +192,12 @@ export default function Header() {
                 >
                   Sign in
                 </Button>
-                <Button 
+                <Button
                   className="w-full"
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={() => {
+                    router.push('/auth/register')
+                    setIsMenuOpen(false)
+                  }}
                 >
                   Get started
                 </Button>

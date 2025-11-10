@@ -96,91 +96,93 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Features Section */}
-        <section id="features" aria-labelledby="features-heading" className="bg-background dark:bg-[#0D1117] py-24 sm:py-32">
-          <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="text-center">
-              <p className="font-semibold text-primary">Productivity</p>
-              <h2 id="features-heading" className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
-                Enhanced Security & Efficiency with Real-time Scanner
-              </h2>
-            </div>
-            <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
-              {[
-                {
-                  name: 'Unprecedented Security Realtime',
-                  description: 'Our scanner ensures that your platform remains resistant to unauthorized access, tampering, and data breaches.',
-                  icon: ShieldCheck,
-                },
-                {
-                  name: 'Trustworthy Data Integrity',
-                  description: 'With our Blockchain Scanner, you can guarantee the integrity of your data by leveraging blockchain\'s immutability.',
-                  icon: Lock,
-                },
-                {
-                  name: 'Seamless Integration & Scalability',
-                  description: 'Our scanner can be easily integrated into your system, ensuring a smooth and hassle-free implementation process.',
-                  icon: Code2,
-                },
-                {
-                  name: 'Streamlined Compliance',
-                  description: 'Our Systems simplifies the compliance process by automatically auditing and tracking.',
-                  icon: Construction,
-                },
-              ].map((feature) => (
-                <div key={feature.name} className="bg-secondary/50 dark:bg-[#161B22] p-8 rounded-lg border">
-                  <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-secondary dark:bg-gray-800 mb-6">
-                    <feature.icon className="h-6 w-6 text-primary" aria-hidden="true" />
+        <div id="how">
+          {/* Features Section */}
+          <section id="features" aria-labelledby="features-heading" className="bg-background dark:bg-[#0D1117] py-24 sm:py-32">
+            <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+              <div className="text-center">
+                <p className="font-semibold text-primary">Productivity</p>
+                <h2 id="features-heading" className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+                  Enhanced Security & Efficiency with Real-time Scanner
+                </h2>
+              </div>
+              <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+                {[
+                  {
+                    name: 'Unprecedented Security Realtime',
+                    description: 'Our scanner ensures that your platform remains resistant to unauthorized access, tampering, and data breaches.',
+                    icon: ShieldCheck,
+                  },
+                  {
+                    name: 'Trustworthy Data Integrity',
+                    description: 'With our Blockchain Scanner, you can guarantee the integrity of your data by leveraging blockchain\'s immutability.',
+                    icon: Lock,
+                  },
+                  {
+                    name: 'Seamless Integration & Scalability',
+                    description: 'Our scanner can be easily integrated into your system, ensuring a smooth and hassle-free implementation process.',
+                    icon: Code2,
+                  },
+                  {
+                    name: 'Streamlined Compliance',
+                    description: 'Our Systems simplifies the compliance process by automatically auditing and tracking.',
+                    icon: Construction,
+                  },
+                ].map((feature) => (
+                  <div key={feature.name} className="bg-secondary/50 dark:bg-[#161B22] p-8 rounded-lg border">
+                    <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-secondary dark:bg-gray-800 mb-6">
+                      <feature.icon className="h-6 w-6 text-primary" aria-hidden="true" />
+                    </div>
+                    <h3 className="text-lg font-semibold">{feature.name}</h3>
+                    <p className="mt-2 text-base text-muted-foreground">{feature.description}</p>
                   </div>
-                  <h3 className="text-lg font-semibold">{feature.name}</h3>
-                  <p className="mt-2 text-base text-muted-foreground">{feature.description}</p>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Workflow Integration Section */}
+          <section id="workflow" aria-labelledby="workflow-heading" className="bg-background dark:bg-[#0D1117] py-24 sm:py-32">
+            <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+              <div className="text-center">
+                <h2 id="workflow-heading" className="text-3xl font-bold tracking-tight sm:text-4xl">
+                  Seamless Integration with Your Workflow
+                </h2>
+                <p className="mt-4 text-lg text-muted-foreground">
+                  ChainX works directly within your development environment, eliminating context switching and making security a natural part of the development process.
+                </p>
+              </div>
+
+              <div className="mt-16 flex justify-center items-center space-x-8">
+                <Github className="h-12 w-12 text-primary"/>
+                <div className="flex-grow h-px bg-primary/50 relative">
+                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 p-2 bg-blue-500/20 rounded-full">
+                    <Link2 className="h-6 w-6 text-primary" />
+                  </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
+                <Zap className="h-12 w-12 text-primary" />
+              </div>
 
-        {/* Workflow Integration Section */}
-        <section id="workflow" aria-labelledby="workflow-heading" className="bg-background dark:bg-[#0D1117] py-24 sm:py-32">
-          <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="text-center">
-              <h2 id="workflow-heading" className="text-3xl font-bold tracking-tight sm:text-4xl">
-                Seamless Integration with Your Workflow
-              </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
-                ChainX works directly within your development environment, eliminating context switching and making security a natural part of the development process.
-              </p>
-            </div>
-
-            <div className="mt-16 flex justify-center items-center space-x-8">
-              <Github className="h-12 w-12 text-primary"/>
-              <div className="flex-grow h-px bg-primary/50 relative">
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 p-2 bg-blue-500/20 rounded-full">
-                  <Link2 className="h-6 w-6 text-primary" />
+              <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-3">
+                <div className="bg-secondary/50 dark:bg-[#161B22] p-8 rounded-lg border">
+                  <GitPullRequest className="h-8 w-8 text-primary mb-4" />
+                  <h3 className="text-lg font-semibold">GitHub Integration</h3>
+                  <p className="mt-2 text-base text-muted-foreground">Automated security scans on every pull request.</p>
+                </div>
+                <div className="bg-secondary/50 dark:bg-[#161B22] p-8 rounded-lg border">
+                  <Code2 className="h-8 w-8 text-primary mb-4" />
+                  <h3 className="text-lg font-semibold">VS Code Extension</h3>
+                  <p className="mt-2 text-base text-muted-foreground">Get real-time vulnerability feedback directly in your editor.</p>
+                </div>
+                <div className="bg-secondary/50 dark:bg-[#161B22] p-8 rounded-lg border">
+                  <Zap className="h-8 w-8 text-primary mb-4" />
+                  <h3 className="text-lg font-semibold">Effortless Setup</h3>
+                  <p className="mt-2 text-base text-muted-foreground">Connect your accounts in minutes and start scanning immediately.</p>
                 </div>
               </div>
-              <Zap className="h-12 w-12 text-primary" />
             </div>
-
-            <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-3">
-              <div className="bg-secondary/50 dark:bg-[#161B22] p-8 rounded-lg border">
-                <GitPullRequest className="h-8 w-8 text-primary mb-4" />
-                <h3 className="text-lg font-semibold">GitHub Integration</h3>
-                <p className="mt-2 text-base text-muted-foreground">Automated security scans on every pull request.</p>
-              </div>
-              <div className="bg-secondary/50 dark:bg-[#161B22] p-8 rounded-lg border">
-                <Code2 className="h-8 w-8 text-primary mb-4" />
-                <h3 className="text-lg font-semibold">VS Code Extension</h3>
-                <p className="mt-2 text-base text-muted-foreground">Get real-time vulnerability feedback directly in your editor.</p>
-              </div>
-              <div className="bg-secondary/50 dark:bg-[#161B22] p-8 rounded-lg border">
-                <Zap className="h-8 w-8 text-primary mb-4" />
-                <h3 className="text-lg font-semibold">Effortless Setup</h3>
-                <p className="mt-2 text-base text-muted-foreground">Connect your accounts in minutes and start scanning immediately.</p>
-              </div>
-            </div>
-          </div>
-        </section>
+          </section>
+        </div>
 
         {/* Security report mockup */}
         <section id="report" aria-labelledby="report-heading" className="bg-secondary/50 dark:bg-[#0D1117] border-y">

@@ -38,10 +38,10 @@ export default function ApiKeyDetailsModal({
   if (!showKeyDetails || !selectedKey) return null
 
   return (
-    <div className="fixed inset-0 bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[85vh] shadow-2xl">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center justify-between">
+    <div className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[85vh] shadow-2xl overflow-y-auto">
+        <div className="p-4 sm:p-6 border-b border-gray-200">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex items-center space-x-3">
               <Key className="h-6 w-6 text-gray-400" />
               <div>
@@ -49,7 +49,7 @@ export default function ApiKeyDetailsModal({
                 <p className="text-sm text-gray-500">API Key Details & Usage</p>
               </div>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={() => {
                   onClose()
@@ -79,7 +79,7 @@ export default function ApiKeyDetailsModal({
               </button>
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:text-gray-600 transition-colors ml-2"
+                className="ml-auto text-gray-400 hover:text-gray-600 transition-colors"
               >
                 <span className="text-2xl">&times;</span>
               </button>
@@ -87,11 +87,11 @@ export default function ApiKeyDetailsModal({
           </div>
         </div>
 
-        <div className="p-6 space-y-6">
+        <div className="p-4 sm:p-6 space-y-6">
           {/* Key Information */}
           <div className="bg-gray-50 p-4 rounded-lg">
             <h3 className="text-sm font-medium text-gray-900 mb-3">Key Information</h3>
-            <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="text-gray-500">Status</p>
                 <span className={`px-2 py-1 text-xs font-medium rounded-full
@@ -117,8 +117,8 @@ export default function ApiKeyDetailsModal({
             </div>
             <div className="mt-3">
               <p className="text-gray-500 text-sm mb-1">API Key</p>
-              <div className="flex items-center space-x-2">
-                <code className="bg-white px-3 py-1 rounded border text-xs flex-1">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:space-x-2">
+                <code className="bg-white px-3 py-1 rounded border text-xs flex-1 break-all">
                   {selectedKey.key}
                 </code>
                 <button
@@ -147,7 +147,7 @@ export default function ApiKeyDetailsModal({
                 const keyUsageByEndpoint = usageStats.usageByKey?.find((k: any) => k.apiKeyId === selectedKey.id)
 
                 return (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div className="bg-blue-50 p-4 rounded-lg">
                       <h4 className="text-sm font-medium text-blue-900 mb-2">Period Usage</h4>
                       <p className="text-2xl font-bold text-blue-600">{keyUsageData?.periodUsage || 0}</p>

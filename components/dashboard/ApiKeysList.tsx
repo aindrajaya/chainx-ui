@@ -44,7 +44,7 @@ export default function ApiKeysList({
   return (
     <div className="space-y-6">
       {/* Header Section */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">API Keys</h1>
           <p className="mt-1 text-sm text-gray-500">
@@ -54,7 +54,7 @@ export default function ApiKeysList({
         <button
           onClick={onGenerateClick}
           disabled={isGenerating}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-75 disabled:cursor-not-allowed"
+          className="inline-flex w-full sm:w-auto items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-75 disabled:cursor-not-allowed"
         >
           {isGenerating ? (
             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -66,7 +66,7 @@ export default function ApiKeysList({
       </div>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
         {[
           { label: 'Total API Calls', value: apiKeys.reduce((sum, key) => sum + key.usage, 0).toLocaleString(), change: '+12.3%' },
           { label: 'Active Keys', value: apiKeys.filter(key => key.status === 'ACTIVE').length.toString(), change: '0%' },
@@ -90,14 +90,14 @@ export default function ApiKeysList({
 
       {/* API Keys List */}
       <div className="bg-white shadow-sm rounded-lg overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between px-4 sm:px-6 py-4 border-b border-gray-200">
           <div className="flex items-center space-x-4">
             <Key className="h-5 w-5 text-gray-400" />
             <h2 className="text-lg font-medium text-gray-900">Your API Keys</h2>
           </div>
           <button
             onClick={onRetryFetch}
-            className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700"
+            className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 w-full sm:w-auto"
           >
             <RefreshCw className="h-4 w-4 mr-1" />
             Refresh
@@ -142,8 +142,8 @@ export default function ApiKeysList({
             </div>
           ) : (
             apiKeys.map((key) => (
-              <div key={key.id} className="px-6 py-4 hover:bg-gray-50 transition-colors">
-                <div className="flex items-center justify-between">
+              <div key={key.id} className="px-4 sm:px-6 py-4 hover:bg-gray-50 transition-colors">
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                   <div className="flex items-center space-x-3">
                     <span className={`w-2 h-2 rounded-full ${
                       key.status === 'ACTIVE' ? 'bg-green-500' : 'bg-red-500'
@@ -171,11 +171,11 @@ export default function ApiKeysList({
                     </div>
                   </div>
 
-                  <div className="flex items-center space-x-4">
-                    <div className="text-sm text-gray-500">
-                      <div className="flex items-center space-x-2">
-                        <span>Usage:</span>
-                        <div className="w-32 h-2 bg-gray-200 rounded-full">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 lg:justify-end">
+                    <div className="text-sm text-gray-500 w-full sm:w-auto">
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:space-x-2">
+                        <span className="text-gray-600">Usage:</span>
+                        <div className="w-full sm:w-32 h-2 bg-gray-200 rounded-full">
                           <div
                             className="h-full bg-green-500 rounded-full"
                             style={{ width: `${Math.min(key.usage, 100)}%` }}
@@ -185,7 +185,7 @@ export default function ApiKeysList({
                       </div>
                     </div>
 
-                    <div className="relative">
+                    <div className="relative self-start sm:self-auto">
                       <button
                         onClick={(e) => {
                           e.stopPropagation()
@@ -200,7 +200,7 @@ export default function ApiKeysList({
                   </div>
                 </div>
 
-                <div className="mt-2 grid grid-cols-3 gap-4 text-xs text-gray-500">
+                <div className="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-gray-500">
                   <div>
                     <span className="block text-gray-400">Created</span>
                     {key.createdAt}

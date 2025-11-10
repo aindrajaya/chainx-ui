@@ -368,7 +368,7 @@ export default function ApiList() {
   }
 
   return (
-    <div className="max-w-8xl mx-auto p-6 space-y-6">
+    <div className="max-w-6xl mx-auto w-full p-4 sm:p-6 space-y-6">
       {/* Error Message */}
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">

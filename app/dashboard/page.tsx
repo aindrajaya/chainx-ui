@@ -13,17 +13,16 @@ export default function DashboardPage(){
     const [showAPIlist, setShowAPIList] = useState(false);
 
     return(
-        <div 
-            className="bg-gray-50"
-            style={{ marginTop: 'var(--header-height, 64px)' }}
+        <div
+            className="bg-gray-50 min-h-screen"
+            style={{ paddingTop: 'var(--header-height, 64px)' }}
         >
-            {/* <Header /> */}
-            {/* <main className="flex-grow p-6"> */}
+            <main className="p-4 sm:p-6 max-w-7xl mx-auto w-full">
                 {showAPIlist ? (
                     <div>
                         <button
                             onClick={() => setShowAPIList(false)}
-                            className="mb-4 px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-600 transition-colors"
+                            className="mb-4 w-full sm:w-auto px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-600 transition-colors text-sm sm:text-base"
                         >
                             Back to Dashboard
                         </button>
@@ -31,11 +30,11 @@ export default function DashboardPage(){
                     </div>
                 ):(
                     <>
-                        <div className="flex justify-between items-center mb-6">
-                            <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                            <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900">Dashboard</h1>
                             <button 
                                 onClick={() => setShowAPIList(true)}
-                                className="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-600 transition-colors"
+                                className="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-600 transition-colors text-sm sm:text-base w-full sm:w-auto"
                             >
                                 Manage API Keys
                             </button>
@@ -48,8 +47,7 @@ export default function DashboardPage(){
                         </div>
                     </>
                 )}
-            {/* </main> */}
-            {/* <Footer /> */}
+            </main>
         </div>
     )
 }

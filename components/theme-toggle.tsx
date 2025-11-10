@@ -43,7 +43,7 @@ export const ThemeToggle = () => {
   }
 
   return (
-    <Button variant="outline" size="icon" onClick={toggleTheme} aria-label="Toggle theme" className="shrink-0">
+    <Button variant="outline" size="icon" onClick={toggleTheme} aria-label="Toggle theme" className="shrink-0 cursor-pointer">
       {theme === "dark" ? (
         <Sun className="h-4 w-4" />
       ) : (

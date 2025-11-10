@@ -59,7 +59,7 @@ export default function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
               {/* Left Column: Text Content */}
               <div className="text-center md:text-left">
-                <p className="font-semibold text-green-400 mb-2">ChainX Insider</p>
+                <p className="font-semibold text-primary mb-2">ChainX Insider</p>
                 <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
                   The Ultimate Blockchain Scanner for Real-Time Analysis
                 </h1>
@@ -69,13 +69,13 @@ export default function HomePage() {
                 <div className="flex flex-col sm:flex-row justify-center md:justify-start gap-4">
                   <Link
                     href="/auth/register"
-                    className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors text-center"
+                    className="bg-primary hover:bg-primary/90 text-white font-bold py-3 px-6 rounded-lg transition-colors text-center"
                   >
                     Try for free
                   </Link>
                   <Link
                     href="#features"
-                    className="bg-secondary hover:bg-secondary/80 border text-secondary-foreground font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
+                    className="bg-secondary hover:bg-secondary/90 border text-secondary-foreground font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
                   >
                     Explore Use Case <span>&rarr;</span>
                   </Link>
@@ -89,7 +89,7 @@ export default function HomePage() {
                   alt="A code editor showing smart contract analysis by ChainX"
                   width={600}
                   height={450}
-                  className="rounded-lg dark:shadow-2xl dark:shadow-green-900/20"
+                  className="rounded-lg dark:shadow-2xl dark:shadow-primary/20"
                 />
               </div>
             </div>
@@ -100,7 +100,7 @@ export default function HomePage() {
         <section id="features" aria-labelledby="features-heading" className="bg-background dark:bg-[#0D1117] py-24 sm:py-32">
           <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center">
-              <p className="font-semibold text-green-400">Productivity</p>
+              <p className="font-semibold text-primary">Productivity</p>
               <h2 id="features-heading" className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
                 Enhanced Security & Efficiency with Real-time Scanner
               </h2>
@@ -130,7 +130,7 @@ export default function HomePage() {
               ].map((feature) => (
                 <div key={feature.name} className="bg-secondary/50 dark:bg-[#161B22] p-8 rounded-lg border">
                   <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-secondary dark:bg-gray-800 mb-6">
-                    <feature.icon className="h-6 w-6 text-green-400" aria-hidden="true" />
+                    <feature.icon className="h-6 w-6 text-primary" aria-hidden="true" />
                   </div>
                   <h3 className="text-lg font-semibold">{feature.name}</h3>
                   <p className="mt-2 text-base text-muted-foreground">{feature.description}</p>
@@ -153,28 +153,28 @@ export default function HomePage() {
             </div>
 
             <div className="mt-16 flex justify-center items-center space-x-8">
-              <Github className="h-12 w-12" />
-              <div className="flex-grow h-px bg-green-500/50 relative">
+              <Github className="h-12 w-12 text-primary"/>
+              <div className="flex-grow h-px bg-primary/50 relative">
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 p-2 bg-blue-500/20 rounded-full">
-                  <Link2 className="h-6 w-6 text-green-400" />
+                  <Link2 className="h-6 w-6 text-primary" />
                 </div>
               </div>
-              <Zap className="h-12 w-12" />
+              <Zap className="h-12 w-12 text-primary" />
             </div>
 
             <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-3">
               <div className="bg-secondary/50 dark:bg-[#161B22] p-8 rounded-lg border">
-                <GitPullRequest className="h-8 w-8 text-green-400 mb-4" />
+                <GitPullRequest className="h-8 w-8 text-primary mb-4" />
                 <h3 className="text-lg font-semibold">GitHub Integration</h3>
                 <p className="mt-2 text-base text-muted-foreground">Automated security scans on every pull request.</p>
               </div>
               <div className="bg-secondary/50 dark:bg-[#161B22] p-8 rounded-lg border">
-                <Code2 className="h-8 w-8 text-green-400 mb-4" />
+                <Code2 className="h-8 w-8 text-primary mb-4" />
                 <h3 className="text-lg font-semibold">VS Code Extension</h3>
                 <p className="mt-2 text-base text-muted-foreground">Get real-time vulnerability feedback directly in your editor.</p>
               </div>
               <div className="bg-secondary/50 dark:bg-[#161B22] p-8 rounded-lg border">
-                <Zap className="h-8 w-8 text-green-400 mb-4" />
+                <Zap className="h-8 w-8 text-primary mb-4" />
                 <h3 className="text-lg font-semibold">Effortless Setup</h3>
                 <p className="mt-2 text-base text-muted-foreground">Connect your accounts in minutes and start scanning immediately.</p>
               </div>
@@ -352,7 +352,7 @@ export default function HomePage() {
                     placeholder="Enter your email"
                     className="flex-1 h-10 bg-background border border-border rounded-md px-3 text-foreground placeholder:text-muted-foreground outline-none focus:border-ring transition-colors"
                   />
-                  <Button className="bg-primary text-primary-foreground hover:bg-primary/90 px-4">
+                  <Button className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 cursor-pointer">
                     Subscribe
                   </Button>
                 </div>

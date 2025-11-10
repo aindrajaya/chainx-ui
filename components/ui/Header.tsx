@@ -119,8 +119,8 @@ export default function Header() {
           {!isMobile && (
             <div className="flex items-center gap-3">
               <ThemeToggle />
-              <Button variant="ghost" className="hidden sm:inline-flex" onClick={() => router.push('/auth/signin')}>Sign in</Button>
-              <Button className="inline-flex">Get started</Button>
+              <Button variant="ghost" className="hidden sm:inline-flex cursor-pointer" onClick={() => router.push('/auth/signin')}>Sign in</Button>
+              <Button className="inline-flex cursor-pointer">Get started</Button>
             </div>
           )}
 

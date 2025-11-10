@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Eye, EyeOff, Shield, Activity, ArrowRight } from 'lucide-react' // Assuming you use lucide-react for icons
+import { Eye, EyeOff, Shield, Activity, ArrowRight, ArrowLeft } from 'lucide-react' // Assuming you use lucide-react for icons
 import Image from "next/image"
 import { useAuth } from "../../lib/auth"
 
@@ -156,6 +156,14 @@ export default function AuthPage() {
       {/* Right Panel */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div className="w-full max-w-md space-y-8">
+          <Link
+            href="/"
+            className="inline-flex items-center text-sm font-medium text-primary hover:text-green-600 transition-colors w-fit"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to homepage
+          </Link>
+
           <div className="text-center">
             <h2 className="text-3xl font-bold text-gray-900">Welcome back</h2>
             <p className="mt-2 text-gray-600">Please sign in to your account</p>

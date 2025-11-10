@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Eye, EyeOff, Shield, Activity, ArrowRight, CheckCircle } from 'lucide-react'
+import { Eye, EyeOff, Shield, Activity, ArrowRight, ArrowLeft, CheckCircle } from 'lucide-react'
 import Image from "next/image"
 
 interface FormData {
@@ -106,6 +106,14 @@ export default function RegisterPage() {
         {/* Right Panel */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
           <div className="w-full max-w-md space-y-8">
+            <Link
+              href="/"
+              className="inline-flex items-center text-sm font-medium text-primary hover:text-green-600 transition-colors w-fit"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to homepage
+            </Link>
+
             <div className="text-center">
               <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
                 <CheckCircle className="h-8 w-8 text-green-600" />
@@ -175,6 +183,14 @@ export default function RegisterPage() {
       {/* Right Panel */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div className="w-full max-w-md space-y-8">
+          <Link
+            href="/"
+            className="inline-flex items-center text-sm font-medium text-primary hover:text-green-600 transition-colors w-fit"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to homepage
+          </Link>
+
           <div className="text-center">
             <h2 className="text-3xl font-bold text-gray-900">Create your account</h2>
             <p className="mt-2 text-gray-600">Join ChainX to get started</p>

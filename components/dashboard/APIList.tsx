@@ -6,6 +6,7 @@ import ApiKeysList from './ApiKeysList'
 import ApiKeyDetailsModal from './ApiKeyDetailsModal'
 import ApiKeyDialogs from './ApiKeyDialogs'
 import ApiUsageStatsSection from './ApiUsageStatsSection'
+import { fetchWithSession } from '@/lib/fetchWithSession'
 
 interface ApiKey {
   id: string
@@ -65,6 +66,9 @@ export default function ApiList() {
   const [usageStats, setUsageStats] = useState<any>(null)
   const [isLoadingStats, setIsLoadingStats] = useState(false)
   const [selectedTimeframe, setSelectedTimeframe] = useState('24h')
+  const handleUnauthorized = () => {
+    setError('Your session has expired. Please sign in again.')
+  }
 
   // Fetch existing API keys and usage stats on component mount
   useEffect(() => {
@@ -77,10 +81,11 @@ export default function ApiList() {
       setIsLoading(true)
       setError(null)
 
-      const response = await fetch("/api/keys/get-all", {
-        method: 'GET',
-        credentials: 'include',
-      })
+      const response = await fetchWithSession(
+        "/api/keys/get-all",
+        { method: 'GET' },
+        { onUnauthorized: handleUnauthorized }
+      )
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
@@ -133,17 +138,20 @@ export default function ApiList() {
     setError(null)
 
     try {
-      const response = await fetch('/api/keys/generate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetchWithSession(
+        '/api/keys/generate',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: name,
+            type: 'PRODUCTION'
+          })
         },
-        credentials: 'include',
-        body: JSON.stringify({
-          name: name,
-          type: 'PRODUCTION'
-        })
-      })
+        { onUnauthorized: handleUnauthorized }
+      )
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
@@ -211,10 +219,11 @@ export default function ApiList() {
     setError(null)
 
     try {
-      const response = await fetch(`/api/keys/delete/${keyToDelete.id}`, {
-        method: 'DELETE',
-        credentials: 'include',
-      })
+      const response = await fetchWithSession(
+        `/api/keys/delete/${keyToDelete.id}`,
+        { method: 'DELETE' },
+        { onUnauthorized: handleUnauthorized }
+      )
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
@@ -244,10 +253,11 @@ export default function ApiList() {
     setError(null)
 
     try {
-      const response = await fetch(`/api/keys/revoke/${keyToRevoke.id}`, {
-        method: 'DELETE',
-        credentials: 'include',
-      })
+      const response = await fetchWithSession(
+        `/api/keys/revoke/${keyToRevoke.id}`,
+        { method: 'DELETE' },
+        { onUnauthorized: handleUnauthorized }
+      )
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
@@ -281,10 +291,11 @@ export default function ApiList() {
     setError(null)
 
     try {
-      const response = await fetch(`/api/keys/rotate/${keyToRotate.id}`, {
-        method: 'POST',
-        credentials: 'include',
-      })
+      const response = await fetchWithSession(
+        `/api/keys/rotate/${keyToRotate.id}`,
+        { method: 'POST' },
+        { onUnauthorized: handleUnauthorized }
+      )
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
@@ -340,10 +351,11 @@ export default function ApiList() {
       setIsLoadingStats(true)
       setError(null)
 
-      const response = await fetch(`/api/keys/usage-stats?timeframe=${timeframe}`, {
-        method: 'GET',
-        credentials: 'include',
-      })
+      const response = await fetchWithSession(
+        `/api/keys/usage-stats?timeframe=${timeframe}`,
+        { method: 'GET' },
+        { onUnauthorized: handleUnauthorized }
+      )
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))

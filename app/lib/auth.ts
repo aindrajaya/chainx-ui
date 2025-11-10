@@ -3,6 +3,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
+import { fetchWithSession } from '@/lib/fetchWithSession'
 
 interface LoginResponse {
   message: string
@@ -21,10 +22,11 @@ export function useAuth() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch('/api/auth/check', {
-        method: 'GET',
-        credentials: 'include',
-      })
+      const response = await fetchWithSession(
+        '/api/auth/check',
+        { method: 'GET' },
+        { redirectOnUnauthorized: false }
+      )
 
       // console.log("DATA FROM AUTH: ", await response.json())
       
@@ -48,12 +50,15 @@ export function useAuth() {
   const login = async (email: string, password: string) => {
     try {
       // Call our API route which proxies to the backend
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // Include cookies for session handling
-        body: JSON.stringify({ email, password }),
-      })
+      const response = await fetchWithSession(
+        '/api/auth/login',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        },
+        { redirectOnUnauthorized: false }
+      )
 
       if (!response.ok) {
         const errorData = await response.json()
@@ -75,10 +80,11 @@ export function useAuth() {
 
   const logout = async () => {
     try {
-      await fetch('/api/auth/logout', {
-        method: 'POST',
-        credentials: 'include',
-      })
+      await fetchWithSession(
+        '/api/auth/logout',
+        { method: 'POST' },
+        { redirectOnUnauthorized: false }
+      )
       
       setIsAuthenticated(false)
       setUserId(null)

@@ -74,8 +74,8 @@ export default function HomePage() {
                     Try for free
                   </Link>
                   <Link
-                    href="#features"
-                    className="bg-secondary hover:bg-secondary/90 border text-secondary-foreground font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
+                    href="/use-cases"
+                    className="bg-secondary hover:bg-secondary/80 border text-secondary-foreground font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
                   >
                     Explore Use Case <span>&rarr;</span>
                   </Link>

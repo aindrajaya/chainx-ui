@@ -3,10 +3,15 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
   try {
+    // Get all cookies to debug
+    const allCookies = request.cookies.getAll()
+    console.log('All cookies received:', allCookies)
+    
     // Get session cookie from the request
     const sessionCookie = request.cookies.get('chainx.sid')
     const userIdCookie = request.cookies.get('userId')
     console.log("SESSION GET: ", sessionCookie)
+    console.log("USER ID GET: ", userIdCookie)
 
     if (!sessionCookie) {
       return NextResponse.json(
@@ -16,17 +21,17 @@ export async function GET(request: NextRequest) {
     }
 
     // Validate session by calling a protected backend endpoint
-    // Forward only the session cookie (backend expects chainx.sid). This mirrors
-    // other proxy routes which directly set 'Cookie': `chainx.sid=${sessionCookie.value}`.
+    // Forward the session cookie to the backend
     const cookieHeader = sessionCookie ? `chainx.sid=${sessionCookie.value}` : (request.headers.get('cookie') || '')
     console.log('Auth check forwarding Cookie header:', cookieHeader)
+    console.log('Auth check session cookie value:', sessionCookie?.value)
     const backendUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/user-api-keys`
     console.log('Auth check forwarding to backend URL:', backendUrl)
 
     const response = await fetch(backendUrl, {
       method: 'GET',
       headers: {
-        ...(cookieHeader ? { 'Cookie': cookieHeader } : {}),
+        'Cookie': cookieHeader,
         'Content-Type': 'application/json',
       },
       // Note: credentials option is not used on server-side fetch

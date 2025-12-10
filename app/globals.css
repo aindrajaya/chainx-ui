@@ -133,3 +133,14 @@
 nextjs-portal {
   display: none !important;
 }
+
+/* Fix autofill background color */
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #f9fafb inset; /* bg-gray-50 */
+  -webkit-text-fill-color: #111827; /* text-gray-900 */
+}
+
+.dark input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #1f2937 inset; /* bg-gray-800 */
+  -webkit-text-fill-color: #f9fafb; /* text-gray-100 */
+}

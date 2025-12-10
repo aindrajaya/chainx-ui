@@ -84,7 +84,7 @@ export default function RegisterPage() {
 
   if (success) {
     return (
-      <div className="flex min-h-screen bg-gray-50">
+      <div className="flex min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
         {/* Left Panel */}
         <div className="hidden lg:flex lg:w-1/2 bg-primary relative">
           <div className="absolute inset-0 bg-gradient-to-br from-primary to-green-800 opacity-90" />
@@ -108,37 +108,37 @@ export default function RegisterPage() {
           <div className="w-full max-w-md space-y-8">
             <Link
               href="/"
-              className="inline-flex items-center text-sm font-medium text-primary hover:text-green-600 transition-colors w-fit"
+              className="inline-flex items-center text-sm font-medium text-primary hover:text-green-600 dark:text-green-400 dark:hover:text-green-300 transition-colors w-fit"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to homepage
             </Link>
 
             <div className="text-center">
-              <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                <CheckCircle className="h-8 w-8 text-green-600" />
+              <div className="mx-auto w-16 h-16 bg-green-100 dark:bg-green-500/10 rounded-full flex items-center justify-center mb-4">
+                <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
               </div>
-              <h2 className="text-3xl font-bold text-gray-900">Check your email</h2>
-              <p className="mt-2 text-gray-600">
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Check your email</h2>
+              <p className="mt-2 text-gray-600 dark:text-gray-300">
                 We've sent a verification code to <strong>{formData.email}</strong>
               </p>
             </div>
 
-            <div className="bg-white p-8 rounded-xl shadow-sm space-y-4">
-              <p className="text-sm text-gray-600 text-center">
+            <div className="bg-white dark:bg-gray-900/70 p-8 rounded-xl shadow-sm dark:shadow-gray-900/40 space-y-4">
+              <p className="text-sm text-gray-600 dark:text-gray-300 text-center">
                 Please check your email and click the verification link to complete your registration.
               </p>
               <Link
                 href="/auth/verify-email"
-                className="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-lg text-white bg-primary hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
+                className="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-lg text-white bg-primary hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-950 focus:ring-primary transition-colors"
               >
                 Go to Email Verification
               </Link>
             </div>
 
-            <p className="text-center text-sm text-gray-600">
+            <p className="text-center text-sm text-gray-600 dark:text-gray-300">
               Already have an account?{' '}
-              <Link href="/auth/signin" className="font-medium text-primary hover:text-green-600 transition-colors">
+              <Link href="/auth/signin" className="font-medium text-primary hover:text-green-600 dark:text-green-400 dark:hover:text-green-300 transition-colors">
                 Sign in
               </Link>
             </p>
@@ -149,7 +149,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
       {/* Left Panel */}
       <div className="hidden lg:flex lg:w-1/2 bg-primary relative">
         <div className="absolute inset-0 bg-gradient-to-br from-primary to-green-800 opacity-90" />
@@ -185,21 +185,21 @@ export default function RegisterPage() {
         <div className="w-full max-w-md space-y-8">
           <Link
             href="/"
-            className="inline-flex items-center text-sm font-medium text-primary hover:text-green-600 transition-colors w-fit"
+            className="inline-flex items-center text-sm font-medium text-primary hover:text-green-600 dark:text-green-400 dark:hover:text-green-300 transition-colors w-fit"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to homepage
           </Link>
 
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-gray-900">Create your account</h2>
-            <p className="mt-2 text-gray-600">Join ChainX to get started</p>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Create your account</h2>
+            <p className="mt-2 text-gray-600 dark:text-gray-300">Join ChainX to get started</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="mt-8 space-y-6 bg-white p-8 rounded-xl shadow-sm">
+          <form onSubmit={handleSubmit} className="mt-8 space-y-6 bg-white dark:bg-gray-900/70 p-8 rounded-xl shadow-sm dark:shadow-gray-900/40">
             <div className="space-y-4">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Full Name
                 </label>
                 <input
@@ -209,13 +209,13 @@ export default function RegisterPage() {
                   required
                   value={formData.name}
                   onChange={handleChange}
-                  className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                  className="mt-1 w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
                   placeholder="John Doe"
                 />
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Email address
                 </label>
                 <input
@@ -225,13 +225,13 @@ export default function RegisterPage() {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                  className="mt-1 w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
                   placeholder="name@company.com"
                 />
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Password
                 </label>
                 <div className="mt-1 relative">
@@ -242,13 +242,13 @@ export default function RegisterPage() {
                     required
                     value={formData.password}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
                     placeholder="••••••••"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
                   >
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
@@ -256,7 +256,7 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Confirm Password
                 </label>
                 <div className="mt-1 relative">
@@ -267,13 +267,13 @@ export default function RegisterPage() {
                     required
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
                     placeholder="••••••••"
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
                   >
                     {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
@@ -281,7 +281,7 @@ export default function RegisterPage() {
               </div>
 
               {error && (
-                <div className="bg-red-50 text-red-500 text-sm p-3 rounded-lg">
+                <div className="bg-red-50 dark:bg-red-500/10 text-red-500 dark:text-red-300 text-sm p-3 rounded-lg">
                   {error}
                 </div>
               )}
@@ -289,7 +289,7 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-lg text-white bg-primary hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-lg text-white bg-primary hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-950 focus:ring-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <span className="flex items-center space-x-2">
@@ -306,9 +306,9 @@ export default function RegisterPage() {
             </div>
           </form>
 
-          <p className="text-center text-sm text-gray-600">
+          <p className="text-center text-sm text-gray-600 dark:text-gray-300">
             Already have an account?{' '}
-            <Link href="/auth/signin" className="font-medium text-primary hover:text-green-600 transition-colors">
+            <Link href="/auth/signin" className="font-medium text-primary hover:text-green-600 dark:text-green-400 dark:hover:text-green-300 transition-colors">
               Sign in
             </Link>
           </p>

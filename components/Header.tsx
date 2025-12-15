@@ -25,6 +25,7 @@ interface MenuItem {
 
 interface HeaderProps {
   isNavigationDisabled?: boolean;
+  centered?: boolean;
 }
 
 const mainMenuItems: MenuItem[] = [
@@ -34,7 +35,7 @@ const mainMenuItems: MenuItem[] = [
   { label: "Support", href: "/support" },
 ]
 
-export default function Header({ isNavigationDisabled = true }: HeaderProps) {
+export default function Header({ isNavigationDisabled = true, centered = false }: HeaderProps) {
   const router = useRouter()
   const {logout} = useAuth()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -51,12 +52,28 @@ export default function Header({ isNavigationDisabled = true }: HeaderProps) {
     await logout()
     router.push('/auth/signin')
   }
+  // Render a simplified, centered header when requested (used on legal pages)
+  if (centered) {
+    return (
+      <header className="bg-white border-b border-gray-200 fixed w-full top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center h-16">
+            <Link href="/" className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold">Cx</span>
+              </div>
+              <span className="text-xl font-bold text-gray-900">ChainX</span>
+            </Link>
+          </div>
+        </div>
+      </header>
+    )
+  }
 
   return (
     <header 
         className="bg-white border-b border-gray-200 fixed w-full top-0 z-50"
         style={{ height: 'var(--header-height, 64px)' }} // 64px is the default height
-        // Add this line to set the CSS variable
         onLoad={() => {
             document.documentElement.style.setProperty(
             '--header-height',

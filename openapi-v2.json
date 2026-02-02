@@ -1,0 +1,2101 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "ChainX Security Scanner API",
+    "description": "Blockchain security scanning service with AI-powered analysis, subscription management, and comprehensive vulnerability detection",
+    "version": "1.0.0",
+    "contact": {
+      "name": "ChainX Support",
+      "email": "arista.indrajaya@gmail.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.chainx.id",
+      "description": "Production server"
+    },
+    {
+      "url": "http://localhost:3000",
+      "description": "Development server"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    },
+    {
+      "apiKeyAuth": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique user identifier"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "User email address"
+          },
+          "name": {
+            "type": "string",
+            "description": "User display name"
+          },
+          "verified": {
+            "type": "boolean",
+            "description": "Email verification status"
+          },
+          "subscriptionPlan": {
+            "type": "string",
+            "enum": ["FREE", "PREMIUM"],
+            "description": "User subscription plan"
+          }
+        }
+      },
+      "ApiKey": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "API key identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "API key name"
+          },
+          "keyValue": {
+            "type": "string",
+            "description": "Masked API key value"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["PRODUCTION", "TEST"],
+            "description": "API key type"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "API key expiration date"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["ACTIVE", "EXPIRED"],
+            "description": "API key status"
+          }
+        }
+      },
+      "ScanResult": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Scan success status"
+          },
+          "file": {
+            "type": "string",
+            "description": "Scanned file path"
+          },
+          "vulnerabilitiesCount": {
+            "type": "integer",
+            "description": "Number of vulnerabilities found"
+          },
+          "dataVulnerabilities": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "Vulnerability details"
+            }
+          },
+          "contracts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "Contract analysis results"
+            }
+          },
+          "analysis": {
+            "type": "object",
+            "properties": {
+              "tools": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Analysis tools used"
+              },
+              "timestamp": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Analysis timestamp"
+              }
+            }
+          }
+        }
+      },
+      "AIScanResult": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "AI scan success status"
+          },
+          "timeTaken": {
+            "type": "number",
+            "description": "Time taken for analysis in seconds"
+          },
+          "results": {
+            "type": "object",
+            "description": "AI analysis results"
+          },
+          "outputFile": {
+            "type": "string",
+            "description": "Path to output file"
+          }
+        }
+      },
+      "Subscription": {
+        "type": "object",
+        "properties": {
+          "planType": {
+            "type": "string",
+            "enum": ["FREE", "PREMIUM"],
+            "description": "Subscription plan type"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["ACTIVE", "INACTIVE", "CANCELLED", "SUSPENDED"],
+            "description": "Subscription status"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Subscription start date"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Subscription end date"
+          }
+        }
+      },
+      "PayPalSubscription": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "PayPal subscription ID"
+          },
+          "planType": {
+            "type": "string",
+            "enum": ["FREE", "PREMIUM"],
+            "description": "Subscription plan type"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["APPROVAL_PENDING", "APPROVED", "ACTIVE", "SUSPENDED", "CANCELLED"],
+            "description": "PayPal subscription status"
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Subscription start time"
+          },
+          "nextBillingTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Next billing date"
+          },
+          "lastPaymentAmount": {
+            "type": "string",
+            "description": "Last payment amount"
+          },
+          "lastPaymentCurrency": {
+            "type": "string",
+            "description": "Last payment currency"
+          },
+          "failedPaymentsCount": {
+            "type": "integer",
+            "description": "Number of failed payments"
+          }
+        }
+      },
+      "Alert": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Alert identifier"
+          },
+          "userId": {
+            "type": "string",
+            "description": "User ID"
+          },
+          "alertType": {
+            "type": "string",
+            "enum": ["CRITICAL_VULNERABILITY", "HIGH_VULNERABILITY", "SCAN_COMPLETED", "QUOTA_WARNING", "CUSTOM"],
+            "description": "Type of alert"
+          },
+          "message": {
+            "type": "string",
+            "description": "Alert message"
+          },
+          "criteria": {
+            "type": "object",
+            "description": "Alert criteria"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Alert active status"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Alert creation date"
+          }
+        }
+      },
+      "Export": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Export identifier"
+          },
+          "userId": {
+            "type": "string",
+            "description": "User ID"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["CSV", "PDF", "ANALYTICS"],
+            "description": "Export type"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["PENDING", "PROCESSING", "COMPLETED", "FAILED"],
+            "description": "Export status"
+          },
+          "fileName": {
+            "type": "string",
+            "description": "Generated file name"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Export creation date"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Error message"
+          },
+          "message": {
+            "type": "string",
+            "description": "Detailed error message"
+          }
+        }
+      },
+      "SuccessResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "description": "Success message"
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/register": {
+      "post": {
+        "summary": "Register a new user",
+        "description": "Create a new user account with email verification",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password", "name"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "User email address"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 6,
+                    "description": "User password"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "User display name"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User registered successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "userId": {
+                      "type": "string"
+                    },
+                    "emailSent": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "summary": "User login",
+        "description": "Authenticate user with email and password",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "userId": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/verify-email": {
+      "post": {
+        "summary": "Verify email address",
+        "description": "Verify user email using OTP code",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "otp"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "otp": {
+                    "type": "string",
+                    "description": "6-digit OTP code"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email verified successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resend-otp": {
+      "post": {
+        "summary": "Resend verification OTP",
+        "description": "Send a new verification OTP to user email",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OTP sent successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/forgot-password": {
+      "post": {
+        "summary": "Request password reset",
+        "description": "Send password reset email to user",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset email sent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reset-password": {
+      "post": {
+        "summary": "Reset password",
+        "description": "Reset user password using reset token",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["token", "newPassword"],
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "description": "Password reset token"
+                  },
+                  "newPassword": {
+                    "type": "string",
+                    "minLength": 6
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/generate-api-key": {
+      "post": {
+        "summary": "Generate API key",
+        "description": "Create a new API key for programmatic access",
+        "tags": ["API Keys"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userId"],
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "description": "User ID"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": ["PRODUCTION", "TEST"],
+                    "default": "PRODUCTION"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "API key name"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "API key generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "apiKey": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/user-api-keys": {
+      "get": {
+        "summary": "Get user API keys",
+        "description": "Retrieve all API keys for a user",
+        "tags": ["API Keys"],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "User ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API keys retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "apiKeys": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/ApiKey"
+                          }
+                        },
+                        "total": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/api-keys/{keyId}": {
+      "delete": {
+        "summary": "Revoke API key",
+        "description": "Revoke an API key",
+        "tags": ["API Keys"],
+        "parameters": [
+          {
+            "name": "keyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "API key ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API key revoked successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/api-keys/{keyId}/rotate": {
+      "post": {
+        "summary": "Rotate API key",
+        "description": "Generate a new API key and revoke the old one",
+        "tags": ["API Keys"],
+        "parameters": [
+          {
+            "name": "keyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "API key ID to rotate"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API key rotated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "oldKey": {
+                      "type": "string"
+                    },
+                    "newKey": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/api-keys/usage-stats": {
+      "get": {
+        "summary": "Get API key usage statistics",
+        "description": "Retrieve usage statistics for API keys",
+        "tags": ["API Keys"],
+        "security": [
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usage statistics retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "stats": {
+                      "type": "object",
+                      "description": "Usage statistics"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/scan": {
+      "post": {
+        "summary": "Scan smart contract",
+        "description": "Perform vulnerability scanning on a Solidity smart contract",
+        "tags": ["Scanning"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Solidity (.sol) file to scan"
+                  },
+                  "symbolic": {
+                    "type": "string",
+                    "enum": ["true", "false"],
+                    "description": "Enable symbolic analysis"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Scan completed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScanResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid file or request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ai-scan": {
+      "post": {
+        "summary": "AI-powered smart contract scan",
+        "description": "Perform AI-powered vulnerability scanning on a smart contract",
+        "tags": ["Scanning"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": ["file", "openrouterApiKey", "model"],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Smart contract file to scan"
+                  },
+                  "openrouterApiKey": {
+                    "type": "string",
+                    "description": "OpenRouter API key"
+                  },
+                  "model": {
+                    "type": "string",
+                    "description": "AI model to use"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "AI scan completed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AIScanResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/webhook": {
+      "post": {
+        "summary": "Webhook endpoint",
+        "description": "Receive webhook notifications from external services",
+        "tags": ["Webhooks"],
+        "security": [
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Webhook payload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook processed successfully"
+          }
+        }
+      }
+    },
+    "/v1/logs": {
+      "get": {
+        "summary": "Get logs",
+        "description": "Retrieve application logs",
+        "tags": ["Webhooks"],
+        "security": [
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Logs retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "logs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/dashboard": {
+      "get": {
+        "summary": "Get dashboard data",
+        "description": "Retrieve user dashboard analytics and statistics",
+        "tags": ["Dashboard"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "User ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dashboard data retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Dashboard analytics data"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/subscription": {
+      "get": {
+        "summary": "Get subscription info",
+        "description": "Retrieve user's subscription and usage information",
+        "tags": ["Subscription"],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "User ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Subscription info retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "subscription": {
+                      "$ref": "#/components/schemas/Subscription"
+                    },
+                    "paypalSubscription": {
+                      "$ref": "#/components/schemas/PayPalSubscription"
+                    },
+                    "usageStats": {
+                      "type": "object",
+                      "description": "Usage statistics"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/subscription/upgrade": {
+      "post": {
+        "summary": "Upgrade subscription",
+        "description": "Upgrade user to premium subscription",
+        "tags": ["Subscription"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userId"],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "planType": {
+                    "type": "string",
+                    "enum": ["PREMIUM"],
+                    "default": "PREMIUM"
+                  },
+                  "returnUrl": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "PayPal return URL"
+                  },
+                  "cancelUrl": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "PayPal cancel URL"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscription upgrade initiated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "paypalSubscriptionId": {
+                      "type": "string"
+                    },
+                    "approvalUrl": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/subscription/cancel": {
+      "post": {
+        "summary": "Cancel subscription",
+        "description": "Cancel user's subscription",
+        "tags": ["Subscription"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userId"],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "description": "Cancellation reason"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscription cancelled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/subscription/suspend": {
+      "post": {
+        "summary": "Suspend subscription",
+        "description": "Suspend user's subscription",
+        "tags": ["Subscription"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userId"],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "description": "Suspension reason"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscription suspended successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/subscription/resume": {
+      "post": {
+        "summary": "Resume subscription",
+        "description": "Resume suspended subscription",
+        "tags": ["Subscription"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userId"],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscription resumed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/alerts": {
+      "get": {
+        "summary": "Get user alerts",
+        "description": "Retrieve all alerts for a user",
+        "tags": ["Alerts"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "User ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Alerts retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "alerts": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Alert"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create alert",
+        "description": "Create a new alert for a user",
+        "tags": ["Alerts"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userId", "alertType"],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "alertType": {
+                    "type": "string",
+                    "enum": ["CRITICAL_VULNERABILITY", "HIGH_VULNERABILITY", "SCAN_COMPLETED", "QUOTA_WARNING", "CUSTOM"]
+                  },
+                  "criteria": {
+                    "type": "object",
+                    "description": "Alert criteria"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Alert created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "alert": {
+                      "$ref": "#/components/schemas/Alert"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/alerts/{alertId}": {
+      "put": {
+        "summary": "Update alert",
+        "description": "Update an existing alert",
+        "tags": ["Alerts"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "alertId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Alert ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userId"],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "alertType": {
+                    "type": "string",
+                    "enum": ["CRITICAL_VULNERABILITY", "HIGH_VULNERABILITY", "SCAN_COMPLETED", "QUOTA_WARNING", "CUSTOM"]
+                  },
+                  "criteria": {
+                    "type": "object"
+                  },
+                  "isActive": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Alert updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete alert",
+        "description": "Delete an alert",
+        "tags": ["Alerts"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "alertId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Alert ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userId"],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Alert deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/exports/csv": {
+      "post": {
+        "summary": "Export scan results to CSV",
+        "description": "Export vulnerability scan results to CSV format",
+        "tags": ["Exports"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userId"],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "scanId": {
+                    "type": "string",
+                    "description": "Specific scan ID to export"
+                  },
+                  "filters": {
+                    "type": "object",
+                    "description": "Export filters"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "CSV export initiated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "export": {
+                      "$ref": "#/components/schemas/Export"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/exports/pdf": {
+      "post": {
+        "summary": "Export scan results to PDF",
+        "description": "Export vulnerability scan results to PDF format",
+        "tags": ["Exports"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userId"],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "scanId": {
+                    "type": "string"
+                  },
+                  "filters": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PDF export initiated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Export"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/exports/analytics": {
+      "post": {
+        "summary": "Export analytics to PDF",
+        "description": "Export dashboard analytics to PDF format",
+        "tags": ["Exports"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userId"],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "dateRange": {
+                    "type": "integer",
+                    "default": 30,
+                    "description": "Number of days for analytics"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Analytics export initiated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Export"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/exports/history": {
+      "get": {
+        "summary": "Get export history",
+        "description": "Retrieve user's export history",
+        "tags": ["Exports"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "User ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Export history retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "history": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Export"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/exports/download/{fileName}": {
+      "get": {
+        "summary": "Download exported file",
+        "description": "Download a previously exported file",
+        "tags": ["Exports"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "fileName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Name of the file to download"
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "User ID for authorization"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File downloaded successfully",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "text/csv": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/newsletter/send": {
+      "post": {
+        "summary": "Send newsletter",
+        "description": "Send newsletter to a specific user",
+        "tags": ["Newsletter"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userId"],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Newsletter sent successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "result": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/newsletter/preview": {
+      "get": {
+        "summary": "Preview newsletter",
+        "description": "Generate newsletter preview for a user",
+        "tags": ["Newsletter"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "User ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Newsletter preview generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "preview": {
+                      "type": "object",
+                      "description": "Newsletter preview content"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/paypal/webhook": {
+      "post": {
+        "summary": "PayPal webhook",
+        "description": "Handle PayPal webhook notifications for subscription events",
+        "tags": ["PayPal"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "PayPal webhook payload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook processed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/subscription/create": {
+      "post": {
+        "summary": "Create PayPal subscription",
+        "description": "Create a new PayPal subscription for a user",
+        "tags": ["PayPal"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userId"],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "planType": {
+                    "type": "string",
+                    "enum": ["FREE", "PREMIUM"],
+                    "default": "PREMIUM"
+                  },
+                  "returnUrl": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "cancelUrl": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscription created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "subscriptionId": {
+                      "type": "string"
+                    },
+                    "approvalUrl": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/subscription/status/{userId}": {
+      "get": {
+        "summary": "Get PayPal subscription status",
+        "description": "Get the current PayPal subscription status for a user",
+        "tags": ["PayPal"],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "User ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Subscription status retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "hasSubscription": {
+                      "type": "boolean"
+                    },
+                    "subscription": {
+                      "$ref": "#/components/schemas/PayPalSubscription"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/subscription/update": {
+      "post": {
+        "summary": "Update PayPal subscription plan",
+        "description": "Upgrade or downgrade PayPal subscription plan",
+        "tags": ["PayPal"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userId", "newPlanType"],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "newPlanType": {
+                    "type": "string",
+                    "enum": ["FREE", "PREMIUM"]
+                  },
+                  "returnUrl": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "cancelUrl": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscription plan updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "subscriptionId": {
+                      "type": "string"
+                    },
+                    "approvalUrl": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/subscription/details/{paypalSubscriptionId}": {
+      "get": {
+        "summary": "Get PayPal subscription details",
+        "description": "Get detailed information about a PayPal subscription",
+        "tags": ["PayPal"],
+        "parameters": [
+          {
+            "name": "paypalSubscriptionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "PayPal subscription ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Subscription details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "subscription": {
+                      "type": "object",
+                      "description": "Detailed PayPal subscription information"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "User authentication and account management"
+    },
+    {
+      "name": "API Keys",
+      "description": "API key generation and management"
+    },
+    {
+      "name": "Scanning",
+      "description": "Smart contract vulnerability scanning"
+    },
+    {
+      "name": "Webhooks",
+      "description": "External webhook integrations"
+    },
+    {
+      "name": "Dashboard",
+      "description": "User dashboard and analytics"
+    },
+    {
+      "name": "Subscription",
+      "description": "Subscription management"
+    },
+    {
+      "name": "Alerts",
+      "description": "Alert system management"
+    },
+    {
+      "name": "Exports",
+      "description": "Data export functionality"
+    },
+    {
+      "name": "Newsletter",
+      "description": "Newsletter management"
+    },
+    {
+      "name": "PayPal",
+      "description": "PayPal payment integration"
+    }
+  ]
+}

@@ -2,24 +2,30 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, BarChart2, FileSearch } from "lucide-react"
+import { Home, BarChart2, FileSearch, MessageSquare, LayoutGrid } from "lucide-react"
 import Image from "next/image"
 
 const navItems = [
-  { 
-    name: "Initial Page", 
-    href: "/dashboard/init", 
-    icon: Home,
-    isActive: true,
-    isAvailable: true
-  },
-
-  { 
-    name: "Dashboard", 
-    href: "/dashboard", 
+  {
+    name: "Home",
+    href: "/dashboard",
     icon: Home,
     isActive: false,
-    isAvailable: false
+    isAvailable: true,
+  },
+  {
+    name: "Chat",
+    href: "/dashboard/chat",
+    icon: MessageSquare,
+    isActive: false,
+    isAvailable: true,
+  },
+  {
+    name: "Templates",
+    href: "/dashboard/templates",
+    icon: LayoutGrid,
+    isActive: false,
+    isAvailable: true,
   },
   { 
     name: "Scanner Analytics", 
@@ -92,21 +98,21 @@ export default function Sidebar() {
                   href={item.href}
                   className={`
                     flex items-center gap-3 px-4 py-3 mb-1 rounded-lg transition-all duration-200
-                    ${item.isActive 
-                      ? "bg-home-50 text-home-600 shadow-sm" 
+                    ${pathname === item.href
+                      ? "bg-home-50 text-home-600 shadow-sm"
                       : "text-neutral-600 hover:bg-neutral-50"
                     }
                   `}
                 >
-                  <item.icon 
+                  <item.icon
                     className={`h-5 w-5 transition-colors
-                      ${item.isActive ? "text-home-500" : "text-neutral-400"}
-                    `} 
+                      ${pathname === item.href ? "text-home-500" : "text-neutral-400"}
+                    `}
                   />
-                  <span className={`text-sm font-medium ${item.isActive ? "font-semibold" : ""}`}>
+                  <span className={`text-sm font-medium ${pathname === item.href ? "font-semibold" : ""}`}>
                     {item.name}
                   </span>
-                  {item.isActive && (
+                  {pathname === item.href && (
                     <div className="ml-auto w-1.5 h-1.5 rounded-full bg-home-500"></div>
                   )}
                 </Link>

@@ -1,89 +1,84 @@
-import { NextResponse } from 'next/server'
-import { getCookieData } from '../../../lib/cookies-exec'
-import { url } from 'inspector'
+import { NextRequest, NextResponse } from 'next/server'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     if (!process.env.NEXT_PUBLIC_API_BASE_URL) {
         throw new Error('API base URL not configured')
     }
 
-    const cookieData = await getCookieData()
-    const cookieDataToken = cookieData.find((cookie) => cookie.name === 'auth-token')
-    const authToken = cookieDataToken?.value.toString()
+    // Get session cookie from the request
+    const sessionCookie = request.cookies.get('chainx.sid')
 
-    console.log('Data Auth token get:', authToken)
-
-    if (!authToken) {
+    if (!sessionCookie) {
       return NextResponse.json(
         { success: false, message: 'Not authenticated' },
         { status: 401 }
       )
     }
 
-    console.log('API key list Token get #0:', authToken)
-
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 5000)
 
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/user-api-keys?userId=${authToken}`,{
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            signal: controller.signal
-        })    
-        console.log('API key list response #1:', response)
-        
-        clearTimeout(timeoutId);
+      // Use session authentication
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/user-api-keys`, {
+        method: 'GET',
+        headers: {
+          'Cookie': `chainx.sid=${sessionCookie.value}`,
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // Ensures cookies are sent
+        signal: controller.signal
+      })
 
-        if(!response.ok){
-            console.error('Failed to get all API keys')
-            return NextResponse.json(
-                { success: false, message: 'Failed to get all API keys' },
-                { status: 500 }
-            )
-        }
+      clearTimeout(timeoutId);
 
-        const data = await response.json()
-        console.log('API key list generated #1:', data.data.apiKeys)
+      if (!response.ok) {
+        console.error('Failed to get all API keys')
+        return NextResponse.json(
+          { success: false, message: 'Failed to get all API keys' },
+          { status: response.status }
+        )
+      }
 
-        if(!data || !data.data || !data.data.apiKeys){
-            console.error('No API keys found, or invalid response')
-            return NextResponse.json(
-                { success: false, message: 'No API keys found, or invalid response' },
-                { status: 404 }
-            )
-        }
+      const data = await response.json()
+      console.log("DATA RECEIVED: ", data.data)
 
-        return NextResponse.json(data)
+      // Backend returns full response object with success, message, and data
+      if (!data.success) {
+        console.error('No API keys found, or invalid response')
+        return NextResponse.json(
+          { success: false, message: 'No API keys found, or invalid response' },
+          { status: 404 }
+        )
+      }
+
+      return NextResponse.json(data)
     } catch (fetchError) {
-        if(fetchError.name === 'AbortError'){
-            console.error('API request timed out')
-            return NextResponse.json(
-                { success: false, message: 'API request timed out' },
-                { status: 500 }
-            )
-        }
-
-        if(fetchError.code === 'ECONNREFUSED'){
-            console.error('backend server not running or not accessible', {
-                url: process.env.NEXT_PUBLIC_API_BASE_URL,
-                error: fetchError
-            })
-            return NextResponse.json(
-                { success: false, message: 'API request failed: Connection refused' },
-                { status: 500 }
-            )
-        }
-
-        throw fetchError
-    } 
+      clearTimeout(timeoutId);
+      if (fetchError.name === 'AbortError') {
+        console.error('API request timed out')
+        return NextResponse.json(
+          { success: false, message: 'API request timed out' },
+          { status: 500 }
+        )
+      }
+      if (fetchError.code === 'ECONNREFUSED') {
+        console.error('backend server not running or not accessible', {
+          url: process.env.NEXT_PUBLIC_API_BASE_URL,
+          error: fetchError
+        })
+        return NextResponse.json(
+          { success: false, message: 'API request failed: Connection refused' },
+          { status: 500 }
+        )
+      }
+      throw fetchError
+    }
   } catch (error) {
     console.error('Failed to get all API keys:', error)
 
-    const errorMessage = error.message === 'backend server not running or not accessible' ? 
+    const errorMessage = error.message === 'backend server not running or not accessible' ?
     'Backend server not running or not accessible' : 'Failed to get all API keys'
 
     return NextResponse.json(

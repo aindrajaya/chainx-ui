@@ -1,20 +1,56 @@
-"use client"
+"use client";
 
-import { Moon, Sun } from "lucide-react"
-import { useTheme } from "next-themes"
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Moon, Sun } from "lucide-react";
 
-export function ThemeToggle() {
-  const { theme, setTheme } = useTheme()
+export const ThemeToggle = () => {
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [mounted, setMounted] = useState(false);
+
+  // Initialize from DOM class/localStorage to avoid mismatch
+  useEffect(() => {
+    setMounted(true);
+    if (typeof window === "undefined") return;
+
+    // Check localStorage first, then system preference
+    const stored = localStorage.getItem("theme");
+    const systemPrefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const initialTheme = (stored === "dark" || stored === "light")
+      ? stored as "light" | "dark"
+      : (systemPrefersDark ? "dark" : "light");
+
+    setTheme(initialTheme);
+    document.documentElement.classList.toggle("dark", initialTheme === "dark");
+  }, []);
+
+  const toggleTheme = () => {
+    const next = theme === "dark" ? "light" : "dark";
+    setTheme(next);
+    document.documentElement.classList.toggle("dark", next === "dark");
+    try {
+      localStorage.setItem("theme", next);
+    } catch {}
+  };
+
+  // Avoid hydration mismatch by not rendering until mounted
+  if (!mounted) {
+    return (
+      <Button variant="outline" size="icon" aria-label="Toggle theme" className="shrink-0">
+        <Moon className="h-4 w-4" />
+      </Button>
+    );
+  }
 
   return (
-    <button
-      onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-      className="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
-    >
-      <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-      <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-      <span className="sr-only">Toggle theme</span>
-    </button>
-  )
-}
+    <Button variant="outline" size="icon" onClick={toggleTheme} aria-label="Toggle theme" className="shrink-0 cursor-pointer">
+      {theme === "dark" ? (
+        <Sun className="h-4 w-4" />
+      ) : (
+        <Moon className="h-4 w-4" />
+      )}
+    </Button>
+  );
+};
 
+export default ThemeToggle;

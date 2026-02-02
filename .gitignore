@@ -69,12 +69,6 @@ typings/
 .yarn-integrity
 
 # dotenv environment variables file
-.env
-.env.test
-
-# lock-files
-yarn.lock
-package-lock.json
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -109,3 +103,7 @@ dist
 
 # unimportant folder
 /example
+branch_structure.json
+temp_auto_push.bat
+temp_interactive_push.bat
+config.bat

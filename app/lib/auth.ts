@@ -3,6 +3,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
+import { fetchWithSession } from '@/lib/fetchWithSession'
 
 interface LoginResponse {
   message: string
@@ -21,10 +22,13 @@ export function useAuth() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch('/api/auth/check', {
-        method: 'GET',
-        credentials: 'include',
-      })
+      const response = await fetchWithSession(
+        '/api/auth/check',
+        { method: 'GET' },
+        { redirectOnUnauthorized: false }
+      )
+
+      // console.log("DATA FROM AUTH: ", await response.json())
       
       if (response.ok) {
         const data = await response.json()
@@ -45,29 +49,27 @@ export function useAuth() {
 
   const login = async (email: string, password: string) => {
     try {
-      // Call your actual login endpoint
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      })
+      // Call our API route which proxies to the backend
+      const response = await fetchWithSession(
+        '/api/auth/login',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        },
+        { redirectOnUnauthorized: false }
+      )
 
       if (!response.ok) {
-        throw new Error('Login failed')
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Login failed')
       }
 
       const data: LoginResponse = await response.json()
-
-      // Set the auth cookie through our own API route
-      await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: data.userId }),
-      })
       
       setIsAuthenticated(true)
       setUserId(data.userId)
-      router.push('/dashboard/init')
+      router.push('/dashboard')
       
       return data
     } catch (error) {
@@ -78,10 +80,11 @@ export function useAuth() {
 
   const logout = async () => {
     try {
-      await fetch('/api/auth/logout', {
-        method: 'POST',
-        credentials: 'include',
-      })
+      await fetchWithSession(
+        '/api/auth/logout',
+        { method: 'POST' },
+        { redirectOnUnauthorized: false }
+      )
       
       setIsAuthenticated(false)
       setUserId(null)

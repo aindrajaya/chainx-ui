@@ -103,13 +103,13 @@ export default function SecurityAlertsComponent() {
   return (
     <div className="bg-white rounded-xl shadow-sm">
       {/* Header */}
-      <div className="p-6 border-b border-gray-100">
-        <div className="flex items-center justify-between">
+      <div className="p-4 sm:p-6 border-b border-gray-100">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center space-x-3">
             <Shield className="h-6 w-6 text-primary" />
             <h2 className="text-xl font-semibold text-gray-900">Security Alerts</h2>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <button className="p-2 hover:bg-gray-100 rounded-lg">
               <Bell className="h-5 w-5 text-gray-500" />
             </button>
@@ -120,7 +120,7 @@ export default function SecurityAlertsComponent() {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-4 gap-4 mt-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mt-6">
           {[
             { label: 'Critical Alerts', value: '2', change: '+1', icon: AlertTriangle },
             { label: 'Active Threats', value: '3', change: '-2', icon: Shield },
@@ -157,13 +157,13 @@ export default function SecurityAlertsComponent() {
                 selectedAlert === alert.id ? 'bg-gray-50' : ''
               }`}
             >
-              <div className="flex items-start space-x-4">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:space-x-4">
                 <div className={`p-2 rounded-lg ${severityStyles[alert.severity]}`}>
                   <IconComponent className="h-5 w-5" />
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                       <h3 className="text-sm font-medium text-gray-900">{alert.title}</h3>
                       <p className="mt-1 text-sm text-gray-500">{alert.description}</p>
@@ -186,7 +186,7 @@ export default function SecurityAlertsComponent() {
                   </div>
 
                   {selectedAlert === alert.id && (
-                    <div className="mt-4 grid grid-cols-3 gap-4 text-sm">
+                    <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
                       {alert.sourceIp && (
                         <div className="bg-gray-100 p-2 rounded">
                           <span className="text-gray-600">Source IP:</span>
@@ -208,10 +208,10 @@ export default function SecurityAlertsComponent() {
                     </div>
                   )}
 
-                  <div className="mt-2 flex items-center space-x-4">
+                  <div className="mt-2 flex flex-wrap items-center gap-3 text-sm">
                     <span className="text-xs text-gray-500">{alert.timestamp}</span>
                     {alert.status !== 'resolved' && (
-                      <div className="flex space-x-2">
+                      <div className="flex flex-wrap gap-2">
                         <button className="flex items-center space-x-1 text-xs text-green-600 hover:text-green-800">
                           <Check className="h-3 w-3" />
                           <span>Mark as resolved</span>
@@ -232,7 +232,7 @@ export default function SecurityAlertsComponent() {
 
       {/* Footer */}
       <div className="p-4 bg-gray-50 border-t border-gray-100">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <span className="text-sm text-gray-600">
             Showing {alerts.length} alerts from the last 24 hours
           </span>

@@ -1,0 +1,834 @@
+openapi: 3.0.3
+info:
+  title: ChainX API
+  description: Smart Contract Vulnerability Scanner API with AI analysis and user management
+  version: 1.0.0
+  contact:
+    email: dev@chainx.id
+servers:
+  - url: http://localhost:3005/api
+    description: Development server
+security:
+  - ApiKeyAuth: []
+paths:
+  /register:
+    post:
+      summary: Register a new user
+      description: Creates a new user account and sends verification OTP
+      tags:
+        - Authentication
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - name
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                password:
+                  type: string
+                  minLength: 6
+                  example: securepassword
+                name:
+                  type: string
+                  example: John Doe
+      responses:
+        '200':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  userId:
+                    type: string
+                  emailSent:
+                    type: boolean
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+  /login:
+    post:
+      summary: Login user
+      description: Authenticates user credentials and returns user ID if verified
+      tags:
+        - Authentication
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  userId:
+                    type: string
+        '401':
+          description: Invalid credentials
+        '403':
+          description: Email not verified
+        '500':
+          description: Internal server error
+  /generate-api-key:
+    post:
+      summary: Generate API key
+      description: Creates a new API key for authenticated user
+      tags:
+        - API Keys
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userId
+                - type
+                - name
+              properties:
+                userId:
+                  type: string
+                type:
+                  type: string
+                  enum:
+                    - PRODUCTION
+                    - TEST
+                name:
+                  type: string
+      responses:
+        '200':
+          description: API key generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  apiKey:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      keyValue:
+                        type: string
+                      type:
+                        type: string
+                      name:
+                        type: string
+                      expiresAt:
+                        type: string
+                        format: date-time
+                      createdAt:
+                        type: string
+                        format: date-time
+                      updatedAt:
+                        type: string
+                        format: date-time
+                      userId:
+                        type: string
+        '500':
+          description: Internal server error
+  /hello:
+    get:
+      summary: Hello endpoint
+      description: Returns a greeting message
+      tags:
+        - Health
+      security: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /:
+    get:
+      summary: Root endpoint
+      description: Returns API information with rate limiting
+      tags:
+        - Health
+      responses:
+        '200':
+          description: API info
+          content:
+            text/plain:
+              schema:
+                type: string
+        '429':
+          description: Too many requests
+  /v1/scan:
+    post:
+      summary: Scan smart contract
+      description: Uploads and scans a Solidity smart contract for vulnerabilities
+      tags:
+        - Scanning
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Solidity contract file (.sol)
+      responses:
+        '200':
+          description: Scan completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: string
+                  file:
+                    type: string
+                  vulnerabilitiesCount:
+                    type: integer
+                  dataVulnerabilities:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        vulnerabilityId:
+                          type: string
+                  message:
+                    type: string
+        '400':
+          description: No file uploaded
+        '429':
+          description: Too many requests
+        '500':
+          description: Database or scan error
+  /v1/ai-scan:
+    post:
+      summary: AI-powered contract scan
+      description: Uses AI models to analyze smart contract for vulnerabilities
+      tags:
+        - Scanning
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Solidity contract file (.sol)
+                openrouterApiKey:
+                  type: string
+                  description: OpenRouter API key
+                model:
+                  type: string
+                  description: AI model to use
+      responses:
+        '200':
+          description: AI analysis completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  timeTaken:
+                    type: number
+                  results:
+                    type: object
+                  outputFile:
+                    type: string
+        '400':
+          description: Missing required fields
+        '429':
+          description: Too many requests
+        '500':
+          description: Analysis failed
+  /v1/user-api-keys:
+    get:
+      summary: Get user API keys
+      description: Retrieves all API keys for a specific user
+      tags:
+        - API Keys
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+          description: User ID
+      responses:
+        '200':
+          description: API keys retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      apiKeys:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                            name:
+                              type: string
+                            keyValue:
+                              type: string
+                            type:
+                              type: string
+                            expiresAt:
+                              type: string
+                              format: date-time
+                            createdAt:
+                              type: string
+                              format: date-time
+                            updatedAt:
+                              type: string
+                              format: date-time
+                            userId:
+                              type: string
+                            status:
+                              type: string
+                      total:
+                        type: integer
+        '400':
+          description: User ID required
+        '500':
+          description: Internal server error
+  /v1/api-keys/{keyId}/revoke:
+    post:
+      summary: Revoke API Key (Soft Delete)
+      description: |
+        **Revoke API Key** - Temporarily disables an API key by setting it to inactive status.
+        
+        ## Key Differences: Revoke vs Delete
+        
+        | Operation | Revoke | Delete |
+        |-----------|--------|--------|
+        | **Action** | Sets `isActive: false` | Removes record from database |
+        | **Reversible** | ✅ Can be re-enabled later | ❌ Cannot be recovered |
+        | **Data Retention** | Key record remains in DB | Key record permanently deleted |
+        | **Use Case** | Temporary suspension | Permanent removal |
+        | **API Response** | Key becomes invalid for auth | Key no longer exists |
+        
+        ### When to use Revoke:
+        - Temporarily disable access (user suspension, security concerns)
+        - Allow for potential re-activation
+        - Maintain audit trail and usage history
+        - User might request re-activation later
+      tags:
+        - API Key Management
+      parameters:
+        - name: keyId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: API Key ID to revoke
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+          description: User ID who owns the API key
+      responses:
+        '200':
+          description: API key revoked successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "API key revoked successfully"
+        '400':
+          description: Invalid request or API key not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "API key not found or does not belong to user"
+        '500':
+          description: Internal server error
+  /v1/api-keys/{keyId}:
+    delete:
+      summary: Delete API Key (Hard Delete)
+      description: |
+        **Delete API Key** - Permanently removes an API key from the database.
+        
+        ## Key Differences: Revoke vs Delete
+        
+        | Operation | Revoke | Delete |
+        |-----------|--------|--------|
+        | **Action** | Sets `isActive: false` | Removes record from database |
+        | **Reversible** | ✅ Can be re-enabled later | ❌ Cannot be recovered |
+        | **Data Retention** | Key record remains in DB | Key record permanently deleted |
+        | **Use Case** | Temporary suspension | Permanent removal |
+        | **API Response** | Key becomes invalid for auth | Key no longer exists |
+        
+        ### When to use Delete:
+        - Permanent removal of compromised keys
+        - User account deletion/cleanup
+        - GDPR compliance (right to erasure)
+        - Keys no longer needed
+        - Prevent any possibility of re-use
+      tags:
+        - API Key Management
+      parameters:
+        - name: keyId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: API Key ID to delete
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+          description: User ID who owns the API key
+      responses:
+        '200':
+          description: API key deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "API key deleted successfully"
+        '400':
+          description: Invalid request or API key not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "API key not found or does not belong to user"
+        '500':
+          description: Internal server error
+  /v1/api-keys/{keyId}/rotate:
+    post:
+      summary: Rotate API Key
+      description: |
+        Rotates an existing API key by generating a new key value and deactivating the old one.
+        
+        This operation:
+        1. Creates a new API key with the same properties (name, type, user)
+        2. Sets the old key to inactive
+        3. Returns both old and new key information
+        
+        Useful for:
+        - Security best practices (regular key rotation)
+        - Responding to potential key compromise
+        - Maintaining continuous service while updating credentials
+      tags:
+        - API Key Management
+      parameters:
+        - name: keyId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: API Key ID to rotate
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+          description: User ID who owns the API key
+      responses:
+        '200':
+          description: API key rotated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "API key rotated successfully"
+                  oldKey:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      name:
+                        type: string
+                  newKey:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      keyValue:
+                        type: string
+                      name:
+                        type: string
+                      expiresAt:
+                        type: string
+                        format: date-time
+        '400':
+          description: Invalid request or API key not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Active API key not found or does not belong to user"
+        '500':
+          description: Internal server error
+  /v1/api-keys/usage-stats:
+    get:
+      summary: Get API Key Usage Statistics
+      description: |
+        Retrieves usage statistics for all API keys belonging to a user.
+        
+        Returns aggregated data including:
+        - Total active keys count
+        - Usage statistics by key type
+        - Recent usage history (last 5 keys used)
+      tags:
+        - API Key Management
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+          description: User ID to get usage stats for
+      responses:
+        '200':
+          description: Usage statistics retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalActiveKeys:
+                    type: integer
+                    example: 3
+                  usageByType:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          example: "SCAN"
+                        _count:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                        _sum:
+                          type: object
+                          properties:
+                            usageCount:
+                              type: integer
+                  recentUsage:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        lastUsed:
+                          type: string
+                          format: date-time
+                        usageCount:
+                          type: integer
+        '400':
+          description: User ID required
+        '500':
+          description: Internal server error
+  /v1/webhook:
+    post:
+      summary: Webhook scan
+      description: External webhook for contract scanning
+      tags:
+        - Webhook
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Scan completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: string
+                  file:
+                    type: string
+                  vulnerabilitiesCount:
+                    type: integer
+                  dataVulnerabilities:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        vulnerabilityId:
+                          type: string
+                  message:
+                    type: string
+        '400':
+          description: No file uploaded
+        '500':
+          description: Scan failed
+  /v1/logs:
+    get:
+      summary: Get webhook logs
+      description: Retrieves webhook request/response logs
+      tags:
+        - Webhook
+      responses:
+        '200':
+          description: Logs retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    timeStamp:
+                      type: string
+                      format: date-time
+                    data:
+                      type: object
+        '500':
+          description: Failed to read logs
+  /forgot-password:
+    post:
+      summary: Forgot password
+      description: Sends password reset email to verified user
+      tags:
+        - Authentication
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: Reset email sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Email required
+        '500':
+          description: Failed to send email
+  /reset-password:
+    post:
+      summary: Reset password
+      description: Resets user password using reset token
+      tags:
+        - Authentication
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - token
+                - newPassword
+              properties:
+                token:
+                  type: string
+                  description: Password reset token
+                newPassword:
+                  type: string
+                  minLength: 6
+      responses:
+        '200':
+          description: Password reset successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Invalid token or password
+        '500':
+          description: Internal server error
+  /verify-email:
+    post:
+      summary: Verify email
+      description: Verifies user email using OTP
+      tags:
+        - Authentication
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - otp
+              properties:
+                email:
+                  type: string
+                  format: email
+                otp:
+                  type: string
+                  minLength: 8
+                  maxLength: 8
+                  description: 8-digit OTP code
+      responses:
+        '200':
+          description: Email verified
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Invalid OTP or email
+        '500':
+          description: Internal server error
+  /resend-otp:
+    post:
+      summary: Resend OTP
+      description: Resends verification OTP to user email
+      tags:
+        - Authentication
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: OTP resent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Email required
+        '500':
+          description: Failed to send OTP
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+tags:
+  - name: Authentication
+    description: User authentication and verification
+  - name: API Keys
+    description: API key management
+  - name: API Key Management
+    description: Advanced API key operations (revoke, delete, rotate)
+  - name: Scanning
+    description: Smart contract vulnerability scanning
+  - name: Webhook
+    description: External webhook integrations
+  - name: Health
+    description: API health and status endpoints

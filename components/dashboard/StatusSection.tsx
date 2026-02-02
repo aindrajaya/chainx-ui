@@ -65,7 +65,7 @@ export default function StatusSection() {
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {card.details.map((detail, i) => (
               <div key={i} className="bg-gray-50 p-3 rounded-lg">
                 <p className="text-sm text-gray-600">{detail.label}</p>

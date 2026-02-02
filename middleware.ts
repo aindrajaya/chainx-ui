@@ -2,8 +2,8 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-// Paths that don't require authentication
-const PUBLIC_PATHS = ['/sigin', '/register', '/forgot-password']
+// Paths that don't require authentication (include auth namespace)
+const PUBLIC_PATHS = ['/auth/signin', '/auth/register', '/forgot-password', '/auth/verify-email']
 
 // Paths that should be protected
 const PROTECTED_PATHS = ['/dashboard', '/profile', '/settings']
@@ -13,15 +13,17 @@ export function middleware(request: NextRequest) {
   const isAuthPage = PUBLIC_PATHS.some(path => pathname.startsWith(path))
   const isProtectedPage = PROTECTED_PATHS.some(path => pathname.startsWith(path))
   
+  // Accept either a legacy 'auth-token' or the session cookie 'chainx.sid'
   const token = request.cookies.get('auth-token')
+  const session = request.cookies.get('chainx.sid')
 
   // Redirect to dashboard if logged in user tries to access auth pages
-  if (isAuthPage && token) {
-    return NextResponse.redirect(new URL('/dashboard/init', request.url))
+  if (isAuthPage && (token || session)) {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   // Redirect to login if user tries to access protected pages without token
-  if (isProtectedPage && !token) {
+  if (isProtectedPage && !(token || session)) {
     const loginUrl = new URL('/auth/signin', request.url)
     loginUrl.searchParams.set('from', pathname)
     return NextResponse.redirect(loginUrl)

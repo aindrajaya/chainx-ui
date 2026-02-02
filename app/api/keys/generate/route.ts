@@ -1,36 +1,54 @@
-import { NextResponse } from 'next/server'
-import { getCookieData } from '../../../lib/cookies-exec'
+import { NextRequest, NextResponse } from 'next/server'
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
-    const cookieData = await getCookieData()
-    const cookieDataToken = cookieData.find((cookie) => cookie.name === 'auth-token')
-    const authToken = cookieDataToken?.value
+    // Get session cookie from the request
+    const sessionCookie = request.cookies.get('chainx.sid')
 
-    console.log('API key list Token get #0:', authToken)
-
-    if (!authToken) {
+    if (!sessionCookie) {
       return NextResponse.json(
         { success: false, message: 'Not authenticated' },
         { status: 401 }
       )
     }
 
+    // Get the request body
+    const body = await request.json()
+    const { name = "API Key", type = "PRODUCTION" } = body
+
+    // Get userId from cookies (saved during login)
+    const userIdCookie = request.cookies.get('userId')
+
+    if (!userIdCookie) {
+      return NextResponse.json(
+        { success: false, message: 'User ID not found. Please log in again.' },
+        { status: 401 }
+      )
+    }
+
+    // Use session authentication for API key generation
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/generate-api-key`, {
       method: 'POST',
       headers: {
+        'Cookie': `chainx.sid=${sessionCookie.value}`,
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // Ensures cookies are sent
       body: JSON.stringify({
-        type: "test",
-        userId: authToken,
-        name: "Test API Key"
+        userId: userIdCookie.value,
+        type: type,
+        name: name
       })
     })
 
-    console.log('API key Generated #1:', response)
-
     const data = await response.json()
+
+    if (!response.ok) {
+      return NextResponse.json(
+        { success: false, message: data?.message || 'Failed to generate API key' },
+        { status: response.status }
+      )
+    }
 
     return NextResponse.json(data)
   } catch (error) {

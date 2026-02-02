@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Eye, EyeOff, Shield, Activity, ArrowRight } from 'lucide-react' // Assuming you use lucide-react for icons
+import { Eye, EyeOff, Shield, Activity, ArrowRight, ArrowLeft } from 'lucide-react' // Assuming you use lucide-react for icons
 import Image from "next/image"
 import { useAuth } from "../../lib/auth"
 
@@ -67,6 +67,7 @@ export default function AuthPage() {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: 'include',
         body: JSON.stringify({ 
           email: formData.email, 
           password: formData.password,
@@ -89,7 +90,7 @@ export default function AuthPage() {
           localStorage.setItem("rememberMe", "true")
         }
   
-        router.push("/dashboard/init")
+        router.push("/dashboard")
       } else {
         setError(data.message || "Invalid credentials")
       }
@@ -121,7 +122,7 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
       {/* Left Panel */}
       <div className="hidden lg:flex lg:w-1/2 bg-primary relative">
         <div className="absolute inset-0 bg-gradient-to-br from-primary to-green-800 opacity-90" />
@@ -156,15 +157,23 @@ export default function AuthPage() {
       {/* Right Panel */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div className="w-full max-w-md space-y-8">
+          <Link
+            href="/"
+            className="inline-flex items-center text-sm font-medium text-primary hover:text-green-600 dark:text-green-400 dark:hover:text-green-300 transition-colors w-fit"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to homepage
+          </Link>
+
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-gray-900">Welcome back</h2>
-            <p className="mt-2 text-gray-600">Please sign in to your account</p>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Welcome back</h2>
+            <p className="mt-2 text-gray-600 dark:text-gray-300">Please sign in to your account</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="mt-8 space-y-6 bg-white p-8 rounded-xl shadow-sm">
+          <form onSubmit={handleSubmit} className="mt-8 space-y-6 bg-white dark:bg-gray-900/70 p-8 rounded-xl shadow-sm dark:shadow-gray-900/50">
             <div className="space-y-4">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Email address
                 </label>
                 <input
@@ -174,13 +183,13 @@ export default function AuthPage() {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                  className="mt-1 w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
                   placeholder="name@company.com"
                 />
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Password
                 </label>
                 <div className="mt-1 relative">
@@ -191,13 +200,13 @@ export default function AuthPage() {
                     required
                     value={formData.password}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
                     placeholder="••••••••"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
                   >
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
@@ -212,19 +221,19 @@ export default function AuthPage() {
                     type="checkbox"
                     checked={formData.rememberMe}
                     onChange={handleChange}
-                    className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
+                    className="h-4 w-4 text-primary border-gray-300 dark:border-gray-600 rounded focus:ring-primary focus:ring-offset-0"
                   />
-                  <label htmlFor="rememberMe" className="ml-2 text-sm text-gray-700">
+                  <label htmlFor="rememberMe" className="ml-2 text-sm text-gray-700 dark:text-gray-300">
                     Remember me
                   </label>
                 </div>
-                <Link href="/forgot-password" className="text-sm font-medium text-primary hover:text-green-600 transition-colors">
+                <Link href="/forgot-password" className="text-sm font-medium text-primary hover:text-green-600 dark:text-green-400 dark:hover:text-green-300 transition-colors">
                   Forgot password?
                 </Link>
               </div>
 
               {error && (
-                <div className="bg-red-50 text-red-500 text-sm p-3 rounded-lg">
+                <div className="bg-red-50 dark:bg-red-500/10 text-red-500 dark:text-red-300 text-sm p-3 rounded-lg">
                   {error}
                 </div>
               )}
@@ -232,7 +241,7 @@ export default function AuthPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-lg text-white bg-primary hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-lg text-white bg-primary hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-gray-950 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <span className="flex items-center space-x-2">
@@ -249,9 +258,9 @@ export default function AuthPage() {
             </div>
           </form>
 
-          <p className="text-center text-sm text-gray-600">
+          <p className="text-center text-sm text-gray-600 dark:text-gray-300">
             Don't have an account?{' '}
-            <Link href="/register" className="font-medium text-primary hover:text-green-600 transition-colors">
+            <Link href="/auth/register" className="font-medium text-primary hover:text-green-600 dark:text-green-400 dark:hover:text-green-300 transition-colors">
               Sign up
             </Link>
           </p>

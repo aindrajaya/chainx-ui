@@ -1,65 +1,206 @@
 "use client"
 
-import { useState } from 'react'
-import { 
-  Key, 
-  MoreVertical, 
-  Copy, 
-  Edit2, 
-  Trash2, 
-  Plus, 
-  RefreshCw,
-  AlertCircle,
-  Check
-} from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Plus, Loader2 } from 'lucide-react'
+import ApiKeysList from './ApiKeysList'
+import ApiKeyDetailsModal from './ApiKeyDetailsModal'
+import ApiKeyDialogs from './ApiKeyDialogs'
+import ApiUsageStatsSection from './ApiUsageStatsSection'
+import { fetchWithSession } from '@/lib/fetchWithSession'
 
 interface ApiKey {
   id: string
   name: string
   key: string
-  status: 'Active' | 'Inactive'
+  status: 'ACTIVE' | 'INACTIVE'
   usage: number
   lastUsed: string
   createdAt: string
+}
+
+interface ApiKeyResponse2 {
+  id: string
+  key: string
+  created_at: string
+}
+
+interface ApiKeyData {
+  id: string
+  name: string
+  keyValue: string
+  type: string
   expiresAt: string
+  createdAt: string
+  updatedAt: string
+  userId: string
+  isActive: boolean
+  lastUsed: string
+  usageCount: number
+}
+
+
+interface ApiKeyResponse {
+  message: string
+  apiKey: ApiKeyData
 }
 
 export default function ApiList() {
   const [copySuccess, setCopySuccess] = useState<string | null>(null)
-  const [selectedKey, setSelectedKey] = useState<string | null>(null)
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [apiKeys, setApiKeys] = useState<ApiKey[]>([]) // Start with empty array
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [keyName, setKeyName] = useState('')
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [keyToDelete, setKeyToDelete] = useState<ApiKey | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [isRevokeDialogOpen, setIsRevokeDialogOpen] = useState(false)
+  const [keyToRevoke, setKeyToRevoke] = useState<ApiKey | null>(null)
+  const [isRevoking, setIsRevoking] = useState(false)
+  const [isRotateDialogOpen, setIsRotateDialogOpen] = useState(false)
+  const [keyToRotate, setKeyToRotate] = useState<ApiKey | null>(null)
+  const [isRotating, setIsRotating] = useState(false)
+  const [selectedKey, setSelectedKey] = useState<ApiKey | null>(null)
+  const [showKeyDetails, setShowKeyDetails] = useState(false)
+  const [usageStats, setUsageStats] = useState<any>(null)
+  const [isLoadingStats, setIsLoadingStats] = useState(false)
+  const [selectedTimeframe, setSelectedTimeframe] = useState('24h')
+  const handleUnauthorized = () => {
+    setError('Your session has expired. Please sign in again.')
+  }
 
-  const apiKeys: ApiKey[] = [
-    {
-      id: "1",
-      name: "Production API Key",
-      key: "pk_live_51Hb6xjK2gjK2gjK2gjK2gjK2",
-      status: "Active",
-      usage: 78,
-      lastUsed: "2 minutes ago",
-      createdAt: "2023-01-15",
-      expiresAt: "2024-01-15"
-    },
-    {
-      id: "2",
-      name: "Development API Key",
-      key: "pk_test_51Hb6xjK2gjK2gjK2gjK2gjK2",
-      status: "Active",
-      usage: 45,
-      lastUsed: "1 hour ago",
-      createdAt: "2023-03-20",
-      expiresAt: "2024-03-20"
-    },
-    {
-      id: "3",
-      name: "Testing API Key",
-      key: "pk_test_51Hb6xjK2gjK2gjK2gjK2gjK3",
-      status: "Inactive",
-      usage: 0,
-      lastUsed: "Never",
-      createdAt: "2023-06-01",
-      expiresAt: "2024-06-01"
-    },
-  ]
+  // Fetch existing API keys and usage stats on component mount
+  useEffect(() => {
+    fetchApiKeys()
+    fetchUsageStats()
+  }, [])
+
+  const fetchApiKeys = async () => {
+    try {
+      setIsLoading(true)
+      setError(null)
+
+      const response = await fetchWithSession(
+        "/api/keys/get-all",
+        { method: 'GET' },
+        { onUnauthorized: handleUnauthorized }
+      )
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.message || `Error: ${response.status}`)
+      }
+
+      const data = await response.json()
+
+      console.log('API key list response:', data)
+
+      // Transform API response to match our interface
+      let formattedKeys: ApiKey[] = data.data.apiKeys.map((key: any) => ({
+        id: key.id,
+        name: key.name || `API Key ${key.id}`,
+        key: key.keyValue,
+        status: key.status,
+        usage: key.usageCount || 0,
+        lastUsed: key.lastUsed ? new Date(key.lastUsed).toLocaleString() : 'Never',
+        createdAt: key.createdAt ? new Date(key.createdAt).toLocaleDateString() : new Date().toLocaleDateString()
+      }))
+
+      // If we have usage stats, merge the lastUsed data
+      if (usageStats && usageStats.apiKeys) {
+        formattedKeys = formattedKeys.map(key => {
+          const usageData = usageStats.apiKeys.find((usageKey: any) => usageKey.id === key.id)
+          if (usageData && usageData.lastUsed) {
+            return {
+              ...key,
+              lastUsed: new Date(usageData.lastUsed).toLocaleString(),
+              usage: usageData.periodUsage || key.usage
+            }
+          }
+          return key
+        })
+      }
+
+      setApiKeys(formattedKeys)
+
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch API keys'
+      setError(errorMessage)
+      console.error('Error fetching API keys:', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const generateApiKey = async (name: string) => {
+    setIsGenerating(true)
+    setError(null)
+
+    try {
+      const response = await fetchWithSession(
+        '/api/keys/generate',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: name,
+            type: 'PRODUCTION'
+          })
+        },
+        { onUnauthorized: handleUnauthorized }
+      )
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.message || `Error: ${response.status}`)
+      }
+
+      const data: ApiKeyResponse = await response.json()
+
+      console.log('Generated API key response:', data)
+
+      // Create new key object from the response
+      const newKey: ApiKey = {
+        id: data.apiKey.id,
+        name: data.apiKey.name || `API Key ${data.apiKey.id}`,
+        key: data.apiKey.keyValue,
+        status: 'ACTIVE',
+        usage: 0,
+        lastUsed: 'Just created',
+        createdAt: new Date().toLocaleDateString()
+      }
+
+      // Add new key to the beginning of the array
+      setApiKeys(prevKeys => [newKey, ...prevKeys])
+
+      // Copy new API key to clipboard
+      await copyToClipboard(newKey.key, newKey.id)
+
+      // Refresh the list to get updated data from server
+      await fetchApiKeys()
+
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to generate API key'
+      setError(errorMessage)
+      console.error('Error generating API key:', err)
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
+  const handleGenerateApiKey = async () => {
+    if (!keyName.trim()) {
+      setError('Please enter a name for the API key')
+      return
+    }
+
+    await generateApiKey(keyName.trim())
+    setIsDialogOpen(false)
+    setKeyName('')
+  }
 
   const copyToClipboard = async (text: string, id: string) => {
     try {
@@ -71,150 +212,256 @@ export default function ApiList() {
     }
   }
 
-  return (
-    <div className="space-y-6">
-      {/* Header Section */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">API Keys</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Manage your API keys and monitor their usage
-          </p>
-        </div>
-        <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-          <Plus className="h-4 w-4 mr-2" />
-          Create New Key
-        </button>
-      </div>
+  const handleDeleteApiKey = async () => {
+    if (!keyToDelete) return
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[
-          { label: 'Total API Calls', value: '1.2M', change: '+12.3%' },
-          { label: 'Active Keys', value: '2', change: '0%' },
-          { label: 'Average Response Time', value: '235ms', change: '-18.5%' },
-        ].map((stat, index) => (
-          <div key={index} className="bg-white rounded-lg shadow-sm p-6">
-            <p className="text-sm font-medium text-gray-500">{stat.label}</p>
-            <div className="mt-2 flex items-baseline">
-              <p className="text-2xl font-semibold text-gray-900">{stat.value}</p>
-              <span className={`ml-2 text-sm ${
-                stat.change.startsWith('+') ? 'text-green-600' : 'text-red-600'
-              }`}>
-                {stat.change}
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
+    setIsDeleting(true)
+    setError(null)
+
+    try {
+      const response = await fetchWithSession(
+        `/api/keys/delete/${keyToDelete.id}`,
+        { method: 'DELETE' },
+        { onUnauthorized: handleUnauthorized }
+      )
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.message || `Error: ${response.status}`)
+      }
+
+      // Remove the deleted key from the list
+      setApiKeys(prevKeys => prevKeys.filter(key => key.id !== keyToDelete.id))
+
+      // Close the dialog
+      setIsDeleteDialogOpen(false)
+      setKeyToDelete(null)
+
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to delete API key'
+      setError(errorMessage)
+      console.error('Error deleting API key:', err)
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
+  const handleRevokeApiKey = async () => {
+    if (!keyToRevoke) return
+
+    setIsRevoking(true)
+    setError(null)
+
+    try {
+      const response = await fetchWithSession(
+        `/api/keys/revoke/${keyToRevoke.id}`,
+        { method: 'DELETE' },
+        { onUnauthorized: handleUnauthorized }
+      )
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.message || `Error: ${response.status}`)
+      }
+
+      // Update the revoked key status in the list
+      setApiKeys(prevKeys => prevKeys.map(key =>
+        key.id === keyToRevoke.id
+          ? { ...key, status: 'INACTIVE' as const }
+          : key
+      ))
+
+      // Close the dialog
+      setIsRevokeDialogOpen(false)
+      setKeyToRevoke(null)
+
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to revoke API key'
+      setError(errorMessage)
+      console.error('Error revoking API key:', err)
+    } finally {
+      setIsRevoking(false)
+    }
+  }
+
+  const handleRotateApiKey = async () => {
+    if (!keyToRotate) return
+
+    setIsRotating(true)
+    setError(null)
+
+    try {
+      const response = await fetchWithSession(
+        `/api/keys/rotate/${keyToRotate.id}`,
+        { method: 'POST' },
+        { onUnauthorized: handleUnauthorized }
+      )
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.message || `Error: ${response.status}`)
+      }
+
+      const data = await response.json()
+      console.log('Rotated API key response:', data)
+
+      // Refresh the list to get updated data from server
+      await fetchApiKeys()
+
+      // Close the dialog
+      setIsRotateDialogOpen(false)
+      setKeyToRotate(null)
+
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to rotate API key'
+      setError(errorMessage)
+      console.error('Error rotating API key:', err)
+    } finally {
+      setIsRotating(false)
+    }
+  }
+
+  const openDeleteDialog = (key: ApiKey) => {
+    setKeyToDelete(key)
+    setIsDeleteDialogOpen(true)
+  }
+
+  const openRevokeDialog = (key: ApiKey) => {
+    setKeyToRevoke(key)
+    setIsRevokeDialogOpen(true)
+  }
+
+  const openRotateDialog = (key: ApiKey) => {
+    setKeyToRotate(key)
+    setIsRotateDialogOpen(true)
+  }
+
+  const handleKeyClick = (key: ApiKey) => {
+    setSelectedKey(key)
+    setShowKeyDetails(true)
+  }
+
+  const closeKeyDetails = () => {
+    setSelectedKey(null)
+    setShowKeyDetails(false)
+  }
+
+  const fetchUsageStats = async (timeframe: string = '24h') => {
+    try {
+      setIsLoadingStats(true)
+      setError(null)
+
+      const response = await fetchWithSession(
+        `/api/keys/usage-stats?timeframe=${timeframe}`,
+        { method: 'GET' },
+        { onUnauthorized: handleUnauthorized }
+      )
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.message || `Error: ${response.status}`)
+      }
+
+      const data = await response.json()
+      console.log("USAGE DATA: ", data.data)
+      setUsageStats(data.data)
+      setSelectedTimeframe(timeframe)
+
+      // Refresh API keys to merge usage data
+      fetchApiKeys()
+
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch usage stats'
+      setError(errorMessage)
+      console.error('Error fetching usage stats:', err)
+    } finally {
+      setIsLoadingStats(false)
+    }
+  }
+
+  return (
+    <div className="max-w-6xl mx-auto w-full p-4 sm:p-6 space-y-6">
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          {error}
+        </div>
+      )}
 
       {/* API Keys List */}
-      <div className="bg-white shadow-sm rounded-lg overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <div className="flex items-center space-x-4">
-            <Key className="h-5 w-5 text-gray-400" />
-            <h2 className="text-lg font-medium text-gray-900">Your API Keys</h2>
-          </div>
-          <button className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700">
-            <RefreshCw className="h-4 w-4 mr-1" />
-            Refresh
-          </button>
-        </div>
+      <ApiKeysList
+        apiKeys={apiKeys}
+        isLoading={isLoading}
+        error={error}
+        copySuccess={copySuccess}
+        isGenerating={isGenerating}
+        onGenerateClick={() => setIsDialogOpen(true)}
+        onKeyClick={handleKeyClick}
+        onCopyToClipboard={copyToClipboard}
+        onRotateDialog={openRotateDialog}
+        onRevokeDialog={openRevokeDialog}
+        onDeleteDialog={openDeleteDialog}
+        onRetryFetch={fetchApiKeys}
+      />
 
-        <div className="divide-y divide-gray-200">
-          {apiKeys.map((key) => (
-            <div key={key.id} className="px-6 py-4 hover:bg-gray-50 transition-colors">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <span className={`w-2 h-2 rounded-full ${
-                    key.status === 'Active' ? 'bg-green-500' : 'bg-red-500'
-                  }`} />
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-900">{key.name}</h3>
-                    <div className="flex items-center mt-1">
-                      <code className="text-xs bg-gray-100 px-2 py-1 rounded">
-                        {key.key.slice(0, 12)}...{key.key.slice(-4)}
-                      </code>
-                      <button 
-                        onClick={() => copyToClipboard(key.key, key.id)}
-                        className="ml-2 text-gray-400 hover:text-gray-600"
-                      >
-                        {copySuccess === key.id ? (
-                          <Check className="h-4 w-4 text-green-500" />
-                        ) : (
-                          <Copy className="h-4 w-4" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                </div>
+      {/* Usage Statistics Section */}
+      <ApiUsageStatsSection
+        usageStats={usageStats}
+        isLoadingStats={isLoadingStats}
+        selectedTimeframe={selectedTimeframe}
+        onTimeframeChange={fetchUsageStats}
+        onRefreshStats={() => fetchUsageStats(selectedTimeframe)}
+      />
 
-                <div className="flex items-center space-x-4">
-                  <div className="text-sm text-gray-500">
-                    <div className="flex items-center space-x-2">
-                      <span>Usage:</span>
-                      <div className="w-32 h-2 bg-gray-200 rounded-full">
-                        <div 
-                          className="h-full bg-primary rounded-full"
-                          style={{ width: `${key.usage}%` }}
-                        />
-                      </div>
-                      <span>{key.usage}%</span>
-                    </div>
-                  </div>
+      {/* API Key Details Modal */}
+      <ApiKeyDetailsModal
+        selectedKey={selectedKey}
+        showKeyDetails={showKeyDetails}
+        usageStats={usageStats}
+        copySuccess={copySuccess}
+        onClose={closeKeyDetails}
+        onCopyToClipboard={copyToClipboard}
+        onRotateDialog={openRotateDialog}
+        onRevokeDialog={openRevokeDialog}
+        onDeleteDialog={openDeleteDialog}
+      />
 
-                  <div className="relative">
-                    <button
-                      onClick={() => setSelectedKey(selectedKey === key.id ? null : key.id)}
-                      className="p-1 rounded-full hover:bg-gray-100"
-                    >
-                      <MoreVertical className="h-5 w-5 text-gray-400" />
-                    </button>
+      {/* API Key Dialogs */}
+      <ApiKeyDialogs
+        // Generate Dialog
+        isDialogOpen={isDialogOpen}
+        setIsDialogOpen={setIsDialogOpen}
+        keyName={keyName}
+        setKeyName={setKeyName}
+        isGenerating={isGenerating}
+        onGenerateApiKey={handleGenerateApiKey}
+        error={error}
+        setError={setError}
 
-                    {selectedKey === key.id && (
-                      <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
-                        <div className="py-1" role="menu">
-                          <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            <Edit2 className="h-4 w-4 mr-3 text-gray-400" />
-                            Edit
-                          </button>
-                          <button className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
-                            <Trash2 className="h-4 w-4 mr-3 text-red-400" />
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
+        // Delete Dialog
+        isDeleteDialogOpen={isDeleteDialogOpen}
+        setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+        keyToDelete={keyToDelete}
+        setKeyToDelete={setKeyToDelete}
+        isDeleting={isDeleting}
+        onDeleteApiKey={handleDeleteApiKey}
 
-              <div className="mt-2 grid grid-cols-3 gap-4 text-xs text-gray-500">
-                <div>
-                  <span className="block text-gray-400">Created</span>
-                  {key.createdAt}
-                </div>
-                <div>
-                  <span className="block text-gray-400">Expires</span>
-                  {key.expiresAt}
-                </div>
-                <div>
-                  <span className="block text-gray-400">Last Used</span>
-                  {key.lastUsed}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+        // Revoke Dialog
+        isRevokeDialogOpen={isRevokeDialogOpen}
+        setIsRevokeDialogOpen={setIsRevokeDialogOpen}
+        keyToRevoke={keyToRevoke}
+        setKeyToRevoke={setKeyToRevoke}
+        isRevoking={isRevoking}
+        onRevokeApiKey={handleRevokeApiKey}
 
-      {/* Usage Warning */}
-      <div className="flex items-center p-4 bg-yellow-50 rounded-lg">
-        <AlertCircle className="h-5 w-5 text-yellow-400 mr-3" />
-        <p className="text-sm text-yellow-700">
-          You are approaching your API rate limit. Consider upgrading your plan to avoid service interruption.
-        </p>
-      </div>
+        // Rotate Dialog
+        isRotateDialogOpen={isRotateDialogOpen}
+        setIsRotateDialogOpen={setIsRotateDialogOpen}
+        keyToRotate={keyToRotate}
+        setKeyToRotate={setKeyToRotate}
+        isRotating={isRotating}
+        onRotateApiKey={handleRotateApiKey}
+      />
     </div>
   )
 }

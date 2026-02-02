@@ -1,8 +1,7 @@
-module.exports = {
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
   reactStrictMode: false,
-  experimental: {
-    appDir: true,
-  },
   images: {
     remotePatterns: [
       {
@@ -11,9 +10,19 @@ module.exports = {
         port: "",
         pathname: "/avatar.windsor.io/**",
       },
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+      {
+        protocol: 'http',
+        hostname: '**',
+      },
     ],
   },
   eslint: {
     ignoreDuringBuilds: true,
   },
-}
+};
+
+export default nextConfig;

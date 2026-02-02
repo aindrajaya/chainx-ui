@@ -38,8 +38,8 @@ const alerts = [
 export default function AlertsSection() {
   return (
     <section className="bg-white rounded-xl shadow-sm">
-      <div className="p-6 border-b border-gray-100">
-        <div className="flex items-center justify-between">
+      <div className="p-4 sm:p-6 border-b border-gray-100">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center space-x-3">
             <Bell className="h-5 w-5 text-gray-400" />
             <h3 className="text-lg font-semibold text-gray-900">Recent Alerts</h3>
@@ -62,11 +62,11 @@ export default function AlertsSection() {
           return (
             <div
               key={alert.id}
-              className={`flex items-start gap-4 p-4 ${typeStyles} transition-colors duration-200 hover:bg-opacity-75`}
+              className={`flex flex-col sm:flex-row items-start gap-3 sm:gap-4 p-4 ${typeStyles} transition-colors duration-200 hover:bg-opacity-75`}
             >
               <alert.icon className="h-5 w-5 mt-1" />
               <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                   <h4 className="font-medium">{alert.title}</h4>
                   <span className="text-xs opacity-75">{alert.time}</span>
                 </div>
